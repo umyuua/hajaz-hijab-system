@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* Star Rating Selector */
+    .star-rating-select {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+    .star-rating-select input {
+        display: none;
+    }
+    .star-rating-select label {
+        font-size: 1.8rem;
+        color: #dee2e6;
+        cursor: pointer;
+        transition: color 0.15s ease-in-out, transform 0.1s ease;
+        line-height: 1;
+        margin: 0;
+    }
+    .star-rating-select label:hover {
+        transform: scale(1.15);
+    }
+    .star-rating-select input:checked ~ label,
+    .star-rating-select label:hover,
+    .star-rating-select label:hover ~ label {
+        color: #f5a623;
+    }
+</style>
+
+<div class="container py-5" style="max-width: 600px;">
+    <h2 class="fw-bold mb-4">Edit Your Feedback</h2>
+    
+    <!-- Product Details Display -->
+    <div class="card border-0 shadow-sm p-4 mb-4 bg-light">
+        <label class="d-block extra-small text-uppercase text-muted fw-bold mb-1">Product Being Reviewed</label>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-semibold text-dark">{{ item.quantity }}x {{ item.product.name }}</span>
+            <span class="small fw-bold text-muted">RM {{ item.price_at_purchase }}</span>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Star Rating Field -->
+            <div class="mb-3">
+                <label class="form-label fw-bold small text-uppercase d-block mb-2">Rating</label>
+                <div class="star-rating-select">
+                    <input type="radio" id="star5" name="rating" value="5" {% if feedback.rating == 5 or not feedback.rating %}checked{% endif %}>
+                    <label for="star5" title="5 stars">★</label>
+
+                    <input type="radio" id="star4" name="rating" value="4" {% if feedback.rating == 4 %}checked{% endif %}>
+                    <label for="star4" title="4 stars">★</label>
+
+                    <input type="radio" id="star3" name="rating" value="3" {% if feedback.rating == 3 %}checked{% endif %}>
+                    <label for="star3" title="3 stars">★</label>
+
+                    <input type="radio" id="star2" name="rating" value="2" {% if feedback.rating == 2 %}checked{% endif %}>
+                    <label for="star2" title="2 stars">★</label>
+
+                    <input type="radio" id="star1" name="rating" value="1" {% if feedback.rating == 1 %}checked{% endif %}>
+                    <label for="star1" title="1 star">★</label>
+                </div>
+            </div>
+
+            <!-- Feedback Message -->
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase">Feedback Message</label>
+                <textarea name="message" class="form-control" rows="4" required>{{ feedback.message }}</textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'order_history' %}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-dark px-4">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

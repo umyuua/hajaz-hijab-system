@@ -1,163 +1,264 @@
 {% extends "base.html" %}
-
 {% block content %}
 <style>
-    .product-detail-container {
-        padding: 50px 0;
+    .detail-container { padding: 80px 0; }
+    .product-main-img { 
+        width: 100%; 
+        border-radius: 8px; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.5s ease;
+        cursor: zoom-in;
     }
-    .detail-img-box {
-        border-radius: 8px;
-        overflow: hidden;
-        background-color: #f8f9fa;
-        aspect-ratio: 3/4;
+    .product-main-img:hover {
+        transform: scale(1.02);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
     }
-    .detail-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .product-title {
-        font-family: 'Bodoni Moda', serif;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: var(--brand-dark, #111827);
-        margin-bottom: 8px;
-    }
-    .price-text {
-        font-size: 1.5rem;
+    .detail-category {
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--brand-primary);
         font-weight: 600;
-        color: var(--brand-slate, #4b5563);
-        margin: 15px 0;
+        font-size: 0.8rem;
     }
-    
-    /* CR-004: Rating Styling */
-    .rating-summary {
+    .detail-title {
+        font-family: 'Bodoni Moda', serif;
+        font-size: 3rem;
+        margin: 15px 0 10px 0;
+        color: var(--brand-dark);
+    }
+
+    /* Rating Summary Badge Under Title */
+    .rating-summary-badge {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 15px;
+        margin-bottom: 20px;
     }
-    .stars-group {
-        color: #f59e0b;
+    .stars-compact {
         font-size: 1.1rem;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
     }
-    .rating-score {
+    .rating-number {
         font-weight: 700;
-        color: #1f2937;
+        color: #2d3748;
+        font-size: 0.95rem;
     }
-    .review-count-text {
-        color: #6b7280;
-        font-size: 0.9rem;
+    .review-count {
+        color: #718096;
+        font-size: 0.85rem;
     }
 
-    /* Feedback & Reviews Section */
-    .reviews-section {
-        margin-top: 60px;
-        border-top: 1px solid #e5e7eb;
-        padding-top: 40px;
+    .detail-price {
+        font-size: 1.5rem;
+        color: var(--brand-dark);
+        font-weight: 700;
+        margin-bottom: 25px;
     }
-    .review-card {
-        background: #ffffff;
-        border: 1px solid #f3f4f6;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    .detail-desc {
+        line-height: 1.8;
+        color: #666;
+        margin-bottom: 35px;
     }
-    .reviewer-name {
-        font-weight: 600;
-        color: #111827;
-        margin-bottom: 2px;
-    }
-    .review-date {
+    .stock-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        background: #f0f0f0;
+        border-radius: 20px;
         font-size: 0.8rem;
-        color: #9ca3af;
+        margin-bottom: 20px;
+    }
+
+    /* Styled Add to Bag Button */
+    .btn-bag {
+        display: block;
+        background: var(--brand-dark);
+        color: white !important;
+        text-decoration: none;
+        padding: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid var(--brand-dark);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-bag:hover {
+        background: transparent;
+        color: var(--brand-dark) !important;
+        border-color: var(--brand-dark);
+    }
+    .disabled-bag {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        border-color: #e2e8f0 !important;
+        cursor: not-allowed;
+    }
+
+    /* Feedback & Star Display */
+    .feedback-section {
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 1px solid #eee;
+    }
+    .feedback-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #222;
+    }
+    .feedback-card {
+        background-color: #f9f9f9;
+        border: 1px solid #eaeaea;
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 15px;
+    }
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+    .feedback-user-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .feedback-user {
+        font-weight: 600;
+        color: #333;
+    }
+    .verified-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        background-color: #e6f4ea;
+        color: #137333;
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+    .feedback-date {
+        font-size: 0.85rem;
+        color: #888;
+    }
+    .star-display {
+        font-size: 1.15rem;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+    .star-gold {
+        color: #f5a623;
+    }
+    .star-grey {
+        color: #ddd;
+    }
+    .feedback-msg {
+        margin: 0;
+        color: #444;
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 </style>
 
-<div class="container product-detail-container">
+<div class="container detail-container">
+    <div class="mb-4">
+        <a href="{% url 'homepage' %}" class="btn-back">
+            <i class="bi bi-arrow-left me-2"></i> Back to Collection
+        </a>
+    </div>
+    
     <div class="row g-5">
         <!-- Product Image -->
         <div class="col-md-6">
-            <div class="detail-img-box">
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-img">
+            <div style="overflow: hidden; border-radius: 8px;">
+                <img src="{{ product.image.url }}" class="product-main-img" alt="{{ product.name }}">
             </div>
         </div>
 
-        <!-- Product Information -->
-        <div class="col-md-6 d-flex flex-column justify-content-center">
-            <span class="text-uppercase text-muted" style="letter-spacing: 2px; font-size: 0.8rem;">
-                {{ product.category }}
-            </span>
-            <h1 class="product-title">{{ product.name }}</h1>
+        <!-- Product Info -->
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="--bs-breadcrumb-divider: '·';">
+                    <li class="breadcrumb-item"><a href="{% url 'homepage' %}" class="text-decoration-none text-muted">Home</a></li>
+                    <li class="breadcrumb-item active">{{ product.category }}</li>
+                </ol>
+            </nav>
 
-            <!-- Star Rating Summary: Only appears if reviews exist -->
-            {% if product.review_count and product.review_count > 0 %}
-            <div class="rating-summary">
-                <span class="stars-group">
-                    {% if product.avg_rating >= 1 %}★{% else %}☆{% endif %}
-                    {% if product.avg_rating >= 2 %}★{% else %}☆{% endif %}
-                    {% if product.avg_rating >= 3 %}★{% else %}☆{% endif %}
-                    {% if product.avg_rating >= 4 %}★{% else %}☆{% endif %}
-                    {% if product.avg_rating >= 5 %}★{% else %}☆{% endif %}
-                </span>
-                <span class="rating-score">{{ product.avg_rating|floatformat:1 }}</span>
-                <span class="review-count-text">({{ product.review_count }} review{{ product.review_count|pluralize }})</span>
+            <span class="detail-category">{{ product.category }}</span>
+            <h1 class="detail-title">{{ product.name }}</h1>
+
+            <!-- Overall Customer Rating Summary -->
+            <div class="rating-summary-badge">
+                <div class="stars-compact">
+                    <span class="{% if avg_rating >= 1 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if avg_rating >= 2 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if avg_rating >= 3 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if avg_rating >= 4 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if avg_rating >= 5 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                </div>
+                <span class="rating-number">{{ avg_rating|default:"0.0" }}</span>
+                <span class="review-count">({{ total_reviews|default:feedbacks.count }} {% if total_reviews == 1 %}review{% else %}reviews{% endif %})</span>
             </div>
-            {% endif %}
 
-            <div class="price-text">RM {{ product.price|floatformat:2 }}</div>
-
-            <p class="text-secondary mb-4" style="line-height: 1.6;">
-                {{ product.description }}
-            </p>
-
-            <div>
-                {% if product.stock == 0 %}
-                    <button class="btn btn-secondary px-5 py-3" disabled>Out of Stock</button>
+            <p class="detail-price">RM {{ product.price|floatformat:2 }}</p>
+            
+            <div class="stock-badge">
+                {% if product.stock > 0 %}
+                    <span class="text-dark">{{ product.stock }} pcs left!</span>
                 {% else %}
-                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark px-5 py-3 text-uppercase" style="letter-spacing: 2px;">
-                        Add to Cart +
-                    </a>
+                    <span class="text-danger">Out of Stock</span>
                 {% endif %}
             </div>
+
+            <div class="detail-desc">
+                {{ product.description|linebreaks }}
+            </div>
+
+            {% if product.stock > 0 %}
+                <a href="{% url 'add_to_cart' product.id %}" 
+                   class="btn-bag ajax-add-to-cart" 
+                   data-product-id="{{ product.id }}">
+                    Add to Cart
+                </a>
+            {% else %}
+                <a class="btn-bag disabled-bag">
+                    Sold Out
+                </a>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Customer Reviews Section -->
-    <div class="reviews-section">
-        <h3 class="h4 font-weight-bold mb-4">Customer Reviews & Feedbacks</h3>
-        
-        <div class="row">
-            <div class="col-lg-8">
-                {% for fb in feedbacks %}
-                <div class="review-card">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div>
-                            <div class="reviewer-name">{{ fb.customer.user.username|default:"Verified Customer" }}</div>
-                            <div class="stars-group" style="font-size: 0.9rem;">
-                                {% if fb.rating >= 1 %}★{% else %}☆{% endif %}
-                                {% if fb.rating >= 2 %}★{% else %}☆{% endif %}
-                                {% if fb.rating >= 3 %}★{% else %}☆{% endif %}
-                                {% if fb.rating >= 4 %}★{% else %}☆{% endif %}
-                                {% if fb.rating >= 5 %}★{% else %}☆{% endif %}
+    <!-- Customer Feedback Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="feedback-section">
+                <h3 class="feedback-title">Customer Feedback</h3>
+
+                {% for fb in feedbacks|default:product.feedbacks.all %}
+                    <div class="feedback-card">
+                        <div class="feedback-header">
+                            <div class="feedback-user-group">
+                                <span class="feedback-user">{{ fb.customer.username }}</span>
+                                <span class="verified-badge">Verified Buyer</span>
                             </div>
+                            <span class="feedback-date">{{ fb.created_at|date:"d M Y" }}</span>
                         </div>
-                        <span class="review-date">{{ fb.created_at|date:"d M Y" }}</span>
+
+                        <!-- Star Rating Display -->
+                        <div class="star-display">
+                            <span class="{% if fb.rating >= 1 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                            <span class="{% if fb.rating >= 2 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                            <span class="{% if fb.rating >= 3 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                            <span class="{% if fb.rating >= 4 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                            <span class="{% if fb.rating >= 5 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                        </div>
+
+                        <p class="feedback-msg">{{ fb.message }}</p>
                     </div>
-                    <p class="mb-0 text-muted" style="font-size: 0.95rem;">
-                        {% if fb.comment %}
-                            {{ fb.comment }}
-                        {% else %}
-                            <span class="fst-italic text-muted">No written review provided.</span>
-                        {% endif %}
-                    </p>
-                </div>
                 {% empty %}
-                <div class="text-muted py-4">
-                    <p class="fst-italic">There are no reviews for this product yet.</p>
-                </div>
+                    <p style="color: #777; font-style: italic;">No feedback for this product yet.</p>
                 {% endfor %}
             </div>
         </div>
