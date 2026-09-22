@@ -496,6 +496,108 @@ def profile_page(request):
     
     return render(request, 'customer/profile.html', {'form': form})
 
+############################ customer submit feedback #########################
+
+@login_required
+def submit_feedback(request, order_id):
+    item = get_object_or_404(OrderItem, id=order_id)
+    
+    if request.method == 'POST':
+        message_text = request.POST.get('message') or request.POST.get('comment')
+        rating_val = request.POST.get('rating', 5)
+        
+        if message_text and message_text.strip():
+            Feedback.objects.create(
+                customer=request.user,
+                order_item=item,
+                product=item.product,
+                rating=int(rating_val),
+                message=message_text.strip(),
+                category='product'
+            )
+            messages.success(request, "Feedback submitted successfully!")
+        else:
+            messages.error(request, "Feedback cannot be empty.")
+            
+    return redirect('order_history')
+
+@login_required
+def submit_all_feedback(request, order_id):
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
+
+    if request.method == 'POST':
+        submitted_count = 0
+
+        for item in order.items.all():
+            if hasattr(item, 'feedback') or item.feedback_set.exists():
+                continue
+
+            rating_val = request.POST.get(f'rating_{item.id}')
+            message_text = request.POST.get(f'message_{item.id}', '').strip()
+
+            if message_text or rating_val:
+                Feedback.objects.create(
+                    customer=request.user,
+                    order_item=item,
+                    product=item.product,
+                    rating=int(rating_val) if rating_val else 5,
+                    message=message_text if message_text else "No written comment.",
+                    category='product'
+                )
+                submitted_count += 1
+
+        if submitted_count > 0:
+            messages.success(request, f"Successfully submitted {submitted_count} review(s)!")
+        else:
+            messages.warning(request, "No new reviews were filled in.")
+
+    return redirect('order_history')
+
+@login_required
+def view_feedback(request):
+    if not request.user.is_staff:
+        return redirect('homepage')
+    feedbacks = Feedback.objects.all().order_by('-created_at')
+    return render(request, 'admin/view_feedback.html', {'feedbacks': feedbacks})
+
+@login_required
+def edit_user_feedback(request, pk):
+    feedback = get_object_or_404(Feedback, pk=pk)
+    if feedback.customer != request.user:
+        messages.error(request, "You can only edit your own feedback.")
+        return redirect('order_history')
+    
+    if request.method == 'POST':
+        message_text = request.POST.get('message')
+        rating_val = request.POST.get('rating')
+        
+        if message_text:
+            feedback.message = message_text.strip()
+        if rating_val:
+            feedback.rating = int(rating_val)
+            
+        feedback.save()
+        messages.success(request, "Feedback updated successfully!")
+        return redirect('order_history')
+            
+    return render(request, 'customer/edit_feedback.html', {
+        'feedback': feedback,
+        'item': feedback.order_item  
+    })
+
+@login_required
+def delete_user_feedback(request, pk):
+    feedback = get_object_or_404(Feedback, pk=pk)
+    if feedback.customer == request.user:
+        feedback.delete()
+        messages.success(request, "Feedback deleted successfully!")
+    else:
+        messages.error(request, "You can only delete your own feedback.")
+    return redirect('order_history')
+
+#### end of customer submit feedback
+
+
 #ADMIN VIEWS
 def is_admin(user):
     return user.groups.filter(name='Admin').exists() or user.is_superuser

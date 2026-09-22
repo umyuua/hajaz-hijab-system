@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .star-gold {
+        color: #f5a623;
+    }
+    .star-grey {
+        color: #ddd;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="mb-5">
+        <a href="{% url 'admin_panel' %}" class="btn-back" style="letter-spacing: 2px;">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+    
+    <h2 class="fw-bold mb-4">User Feedback</h2>
+    
+    <div class="card border-0 shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Product / Item</th>
+                        <th>Rating</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fb in feedbacks %}
+                    <tr>
+                        <td class="fw-bold">{{ fb.customer.username }}</td>
+                        <td>
+                            {% if fb.order_item and fb.order_item.product %}
+                                {{ fb.order_item.product.name }}
+                            {% elif fb.product %}
+                                {{ fb.product.name }}
+                            {% else %}
+                                <span class="text-muted">General</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="letter-spacing: 2px; font-size: 1rem;">
+                                <span class="{% if fb.rating >= 1 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                <span class="{% if fb.rating >= 2 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                <span class="{% if fb.rating >= 3 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                <span class="{% if fb.rating >= 4 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                <span class="{% if fb.rating >= 5 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                            </div>
+                        </td>
+                        <td class="text-muted">{{ fb.message }}</td>
+                        <td>{{ fb.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No feedback available yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -41,6 +41,7 @@ urlpatterns = [
     path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
     path('orders/<int:order_id>/feedback/', views.submit_feedback, name='submit_feedback'),
     path('orders/<int:order_id>/submit-all-feedback/', views.submit_all_feedback, name='submit_all_feedback'),
+    path('internal/feedback/', views.view_feedback, name='view_feedback'),
     path('feedback/<int:pk>/edit/', views.edit_user_feedback, name='edit_user_feedback'),
     path('feedback/<int:pk>/delete/', views.delete_user_feedback, name='delete_user_feedback'),
 ]
