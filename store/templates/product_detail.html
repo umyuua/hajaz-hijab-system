@@ -1,140 +1,165 @@
 {% extends "base.html" %}
+
 {% block content %}
 <style>
-    .detail-container { padding: 80px 0; }
-    .product-main-img { 
-        width: 100%; 
-        border-radius: 8px; 
-        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    .product-detail-container {
+        padding: 50px 0;
     }
-    .detail-category {
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        color: var(--brand-primary);
-        font-weight: 600;
-        font-size: 0.8rem;
-    }
-    .detail-title {
-        font-family: 'Bodoni Moda', serif;
-        font-size: 3rem;
-        margin: 15px 0;
-        color: var(--brand-dark);
-    }
-    .detail-price {
-        font-size: 1.5rem;
-        color: var(--brand-dark);
-        font-weight: 700;
-        margin-bottom: 30px;
-    }
-    .detail-desc {
-        line-height: 1.8;
-        color: #666;
-        margin-bottom: 40px;
-    }
-    .stock-badge {
-        display: inline-block;
-        padding: 5px 15px;
-        background: #f0f0f0;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        margin-bottom: 20px;
-    }
-
-    /* Image Hover Effect */
-    .product-main-img { 
-        width: 100%; 
-        border-radius: 8px; 
-        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.5s ease;
-        cursor: zoom-in;
-    }
-
-    .product-main-img:hover {
-        transform: scale(1.02);
-        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
-    }
-
-    /* Styled Add to Bag Button */
-    .btn-bag {
-        display: block;
-        background: var(--brand-dark);
-        color: white !important;
-        text-decoration: none;
-        padding: 20px;
-        text-transform: uppercase;
-        letter-spacing: 3px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-align: center;
-        border: 1px solid var(--brand-dark);
-        transition: all 0.4s ease;
-        position: relative;
+    .detail-img-box {
+        border-radius: 8px;
         overflow: hidden;
+        background-color: #f8f9fa;
+        aspect-ratio: 3/4;
+    }
+    .detail-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .product-title {
+        font-family: 'Bodoni Moda', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--brand-dark, #111827);
+        margin-bottom: 8px;
+    }
+    .price-text {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--brand-slate, #4b5563);
+        margin: 15px 0;
+    }
+    
+    /* CR-004: Rating Styling */
+    .rating-summary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    .stars-group {
+        color: #f59e0b;
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+    }
+    .rating-score {
+        font-weight: 700;
+        color: #1f2937;
+    }
+    .review-count-text {
+        color: #6b7280;
+        font-size: 0.9rem;
     }
 
-    .btn-bag:hover {
-        background: transparent;
-        color: var(--brand-dark) !important;
-        border-color: var(--brand-dark);
+    /* Feedback & Reviews Section */
+    .reviews-section {
+        margin-top: 60px;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 40px;
     }
-
-    /* Soldier Out Button State */
-    .disabled-bag {
-        background: #f1f5f9 !important;
-        color: #94a3b8 !important;
-        border-color: #e2e8f0 !important;
-        cursor: not-allowed;
+    .review-card {
+        background: #ffffff;
+        border: 1px solid #f3f4f6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .reviewer-name {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 2px;
+    }
+    .review-date {
+        font-size: 0.8rem;
+        color: #9ca3af;
     }
 </style>
 
-<div class="container detail-container">
-    <div class="mb-4">
-        <a href="{% url 'homepage' %}" class="btn-back">
-            <i class="bi bi-arrow-left me-2"></i> Back to Collection
-        </a>
-    </div>
+<div class="container product-detail-container">
     <div class="row g-5">
+        <!-- Product Image -->
         <div class="col-md-6">
-            <div style="overflow: hidden; border-radius: 8px;">
-                <img src="{{ product.image.url }}" class="product-main-img" alt="{{ product.name }}">
+            <div class="detail-img-box">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="detail-img">
             </div>
         </div>
 
-        <div class="col-md-6">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb" style="--bs-breadcrumb-divider: '·';">
-                    <li class="breadcrumb-item"><a href="{% url 'homepage' %}" class="text-decoration-none text-muted">Home</a></li>
-                    <li class="breadcrumb-item active">{{ product.category }}</li>
-                </ol>
-            </nav>
+        <!-- Product Information -->
+        <div class="col-md-6 d-flex flex-column justify-content-center">
+            <span class="text-uppercase text-muted" style="letter-spacing: 2px; font-size: 0.8rem;">
+                {{ product.category }}
+            </span>
+            <h1 class="product-title">{{ product.name }}</h1>
 
-            <span class="detail-category">{{ product.category }}</span>
-            <h1 class="detail-title">{{ product.name }}</h1>
-            <p class="detail-price">RM {{ product.price|floatformat:2 }}</p>
-            
-            <div class="stock-badge">
-                {% if product.stock > 0 %}
-                    <span class="text-dark">{{ product.stock }} pcs left!</span>
+            <!-- Star Rating Summary: Only appears if reviews exist -->
+            {% if product.review_count and product.review_count > 0 %}
+            <div class="rating-summary">
+                <span class="stars-group">
+                    {% if product.avg_rating >= 1 %}★{% else %}☆{% endif %}
+                    {% if product.avg_rating >= 2 %}★{% else %}☆{% endif %}
+                    {% if product.avg_rating >= 3 %}★{% else %}☆{% endif %}
+                    {% if product.avg_rating >= 4 %}★{% else %}☆{% endif %}
+                    {% if product.avg_rating >= 5 %}★{% else %}☆{% endif %}
+                </span>
+                <span class="rating-score">{{ product.avg_rating|floatformat:1 }}</span>
+                <span class="review-count-text">({{ product.review_count }} review{{ product.review_count|pluralize }})</span>
+            </div>
+            {% endif %}
+
+            <div class="price-text">RM {{ product.price|floatformat:2 }}</div>
+
+            <p class="text-secondary mb-4" style="line-height: 1.6;">
+                {{ product.description }}
+            </p>
+
+            <div>
+                {% if product.stock == 0 %}
+                    <button class="btn btn-secondary px-5 py-3" disabled>Out of Stock</button>
                 {% else %}
-                    <span class="text-danger">Out of Stock</span>
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark px-5 py-3 text-uppercase" style="letter-spacing: 2px;">
+                        Add to Cart +
+                    </a>
                 {% endif %}
             </div>
+        </div>
+    </div>
 
-            <div class="detail-desc">
-                {{ product.description|linebreaks }}
+    <!-- Customer Reviews Section -->
+    <div class="reviews-section">
+        <h3 class="h4 font-weight-bold mb-4">Customer Reviews & Feedbacks</h3>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                {% for fb in feedbacks %}
+                <div class="review-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <div class="reviewer-name">{{ fb.customer.user.username|default:"Verified Customer" }}</div>
+                            <div class="stars-group" style="font-size: 0.9rem;">
+                                {% if fb.rating >= 1 %}★{% else %}☆{% endif %}
+                                {% if fb.rating >= 2 %}★{% else %}☆{% endif %}
+                                {% if fb.rating >= 3 %}★{% else %}☆{% endif %}
+                                {% if fb.rating >= 4 %}★{% else %}☆{% endif %}
+                                {% if fb.rating >= 5 %}★{% else %}☆{% endif %}
+                            </div>
+                        </div>
+                        <span class="review-date">{{ fb.created_at|date:"d M Y" }}</span>
+                    </div>
+                    <p class="mb-0 text-muted" style="font-size: 0.95rem;">
+                        {% if fb.comment %}
+                            {{ fb.comment }}
+                        {% else %}
+                            <span class="fst-italic text-muted">No written review provided.</span>
+                        {% endif %}
+                    </p>
+                </div>
+                {% empty %}
+                <div class="text-muted py-4">
+                    <p class="fst-italic">There are no reviews for this product yet.</p>
+                </div>
+                {% endfor %}
             </div>
-            {% if product.stock > 0 %}
-                <a href="{% url 'add_to_cart' product.id %}" 
-                            class="btn-bag ajax-add-to-cart" 
-                            data-product-id="{{ product.id }}" class="btn-bag">
-                    Add to Cart
-                </a>
-            {% else %}
-                <a class="btn-bag disabled-bag">
-                    Sold Out
-                </a>
-            {% endif %}
-            
         </div>
     </div>
 </div>
