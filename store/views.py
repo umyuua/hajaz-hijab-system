@@ -19,13 +19,16 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
 
 
-# Create your views here.
-def welcome(request):
-    return render (request,"welcome.html")
-
+# CR-004: Calculate average review rating and review count per product
 def homepage(request):
-    bawal_products = Product.objects.filter(category__iexact='bawal')
-    shawl_products = Product.objects.filter(category__iexact='shawl')
+    bawal_products = Product.objects.filter(category__iexact='bawal').annotate(
+        avg_rating=Avg('feedbacks__rating'),
+        review_count=Count('feedbacks')
+    )
+    shawl_products = Product.objects.filter(category__iexact='shawl').annotate(
+        avg_rating=Avg('feedbacks__rating'),
+        review_count=Count('feedbacks')
+    )
     
     context = {
         'bawal': bawal_products,
