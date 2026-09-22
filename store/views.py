@@ -15,7 +15,7 @@ from datetime import timedelta
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-from django.db.models import Sum, Avg, Count, F
+from django.db.models import Sum, Avg, Count, F, Q
 from django.db.models.functions import ExtractWeekDay
 from django.utils import timezone
 from django.db import transaction
@@ -32,24 +32,63 @@ from django.shortcuts import render, redirect, get_object_or_404
 def welcome(request):
     return render (request,"welcome.html")
 
+def get_products(category, sort='default'):
+    products = Product.objects.filter(
+        category__iexact=category
+    ).annotate(
+        avg_rating=Avg('feedbacks__rating'),
+        review_count=Count(
+            'feedbacks',
+            distinct=True
+        ),
+        total_sold=Sum(
+            'orderitem__quantity',
+            filter=Q(
+                orderitem__order__payment_status='VERIFIED'
+            )
+        )
+    )
+
+    if sort == 'best_seller':
+        products = products.order_by(
+            '-total_sold',
+            '-avg_rating'
+        )
+
+    elif sort == 'top_rating':
+        products = products.order_by(
+            '-avg_rating',
+            '-review_count'
+        )
+
+    elif sort == 'price_low':
+        products = products.order_by('price')
+
+    elif sort == 'price_high':
+        products = products.order_by('-price')
+
+    return products
+
 def homepage(request):
-    # Mengambil produk kategori bawal berserta purata rating
-    bawal_products = Product.objects.filter(category__iexact='bawal').annotate(
-        avg_rating=Avg('feedbacks__rating'),
-        review_count=Count('feedbacks')
-    )
-    
-    # Mengambil produk kategori shawl berserta purata rating
-    shawl_products = Product.objects.filter(category__iexact='shawl').annotate(
-        avg_rating=Avg('feedbacks__rating'),
-        review_count=Count('feedbacks')
-    )
-    
+    sort = request.GET.get('sort', 'default')
+
     context = {
-        'bawal': bawal_products,
-        'shawl': shawl_products,
+        'bawal': get_products('bawal', sort),
+        'shawl': get_products('shawl', sort),
+        'current_sort': sort,
     }
+
     return render(request, 'homepage.html', context)
+
+def filter_products(request):
+    sort = request.GET.get('sort', 'default')
+
+    context = {
+        'bawal': get_products('bawal', sort),
+        'shawl': get_products('shawl', sort),
+    }
+
+    return render(request, 'product_grid.html', context)
 
 def is_cust(user):
     return user.groups.filter(name='Customer').exists()

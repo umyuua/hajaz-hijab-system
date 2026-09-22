@@ -1,0 +1,182 @@
+<!-- Bawal Products -->
+<div id="bawal">
+    <h2 class="section-label">Bawal Series</h2>
+
+    <div class="row g-4">
+        {% for product in bawal %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="product-wrapper">
+
+                <div class="img-box">
+
+                    <a href="{% url 'product_detail' product.slug %}">
+                        <img src="{{ product.image.url }}"
+                             class="product-img"
+                             alt="{{ product.name }}">
+                    </a>
+
+                    {% if product.stock == 0 %}
+
+                        <a class="bag-btn" style="text-decoration: none;">
+                            Out of stock!
+                        </a>
+
+                    {% else %}
+
+                        <a href="{% url 'add_to_cart' product.id %}"
+                           class="bag-btn ajax-add-to-cart"
+                           data-product-id="{{ product.id }}"
+                           style="text-decoration: none;">
+                            Add to Cart +
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+                <a href="{% url 'product_detail' product.slug %}"
+                   class="product-title">
+                    {{ product.name }}
+                </a>
+
+                <p class="price-tag">
+                    RM {{ product.price|floatformat:2 }}
+                </p>
+
+                <div class="product-rating-badge">
+
+                    <span class="{% if product.avg_rating >= 1 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 2 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 3 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 4 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 5 %}star-gold{% else %}star-grey{% endif %}">★</span>
+
+                    {% if product.avg_rating %}
+                        <span class="rating-score">
+                            {{ product.avg_rating|floatformat:1 }}
+                        </span>
+
+                        <span class="review-num">
+                            ({{ product.review_count }})
+                        </span>
+                    {% else %}
+                        <span class="review-num">
+                            No reviews
+                        </span>
+                    {% endif %}
+
+                </div>
+                <div class="product-sold">
+                    {% if product.total_sold %}
+                        {{ product.total_sold }} sold
+                    {% else %}
+                        0 sold
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        {% empty %}
+
+        <p class="text-center">
+            No products available.
+        </p>
+
+        {% endfor %}
+    </div>
+</div>
+
+
+<div style="height: 60px;"></div>
+
+
+<!-- Shawl Products -->
+<div id="shawl">
+    <h2 class="section-label">Shawl Series</h2>
+
+    <div class="row g-4">
+        {% for product in shawl %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="product-wrapper">
+
+                <div class="img-box">
+
+                    <a href="{% url 'product_detail' product.slug %}">
+                        <img src="{{ product.image.url }}"
+                             class="product-img"
+                             alt="{{ product.name }}">
+                    </a>
+
+                    {% if product.stock == 0 %}
+
+                        <a class="bag-btn" style="text-decoration: none;">
+                            Out of stock!
+                        </a>
+
+                    {% else %}
+
+                        <a href="{% url 'add_to_cart' product.id %}"
+                           class="bag-btn ajax-add-to-cart"
+                           data-product-id="{{ product.id }}"
+                           style="text-decoration: none;">
+                            Add to Cart +
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+                <a href="{% url 'product_detail' product.slug %}"
+                   class="product-title">
+                    {{ product.name }}
+                </a>
+
+                <p class="price-tag">
+                    RM {{ product.price|floatformat:2 }}
+                </p>
+
+                <div class="product-rating-badge">
+
+                    <span class="{% if product.avg_rating >= 1 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 2 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 3 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 4 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                    <span class="{% if product.avg_rating >= 5 %}star-gold{% else %}star-grey{% endif %}">★</span>
+
+                    {% if product.avg_rating %}
+                        <span class="rating-score">
+                            {{ product.avg_rating|floatformat:1 }}
+                        </span>
+
+                        <span class="review-num">
+                            ({{ product.review_count }})
+                        </span>
+                    {% else %}
+                        <span class="review-num">
+                            No reviews
+                        </span>
+                    {% endif %}
+
+                </div>
+                <div class="product-sold">
+                    {% if product.total_sold %}
+                        {{ product.total_sold }} sold
+                    {% else %}
+                        0 sold
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+
+        {% empty %}
+
+        <p class="text-center">
+            No products available.
+        </p>
+
+        {% endfor %}
+    </div>
+    
+</div>
