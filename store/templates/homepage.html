@@ -2,9 +2,104 @@
 
 {% block content %}
 <style>
+/* Product Sort Dropdown */
+
+.product-sort {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.product-sort label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--brand-dark);
+}
+
+.product-sort select {
+    min-width: 210px;
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    background-color: #fff;
+    color: var(--brand-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.3s ease;
+}
+
+.product-sort select:hover,
+.product-sort select:focus {
+    border-color: var(--brand-dark);
+}
+
+@media (max-width: 576px) {
+
+    .product-sort {
+        justify-content: space-between;
+    }
+
+    .product-sort select {
+        min-width: 180px;
+    }
+
+}
+        /* Product Filter */
+    .product-filter {
+        margin-top: 20px;
+    }
+
+    .filter-label {
+        display: block;
+        font-family: 'Bodoni Moda', serif;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        color: var(--brand-dark);
+        margin-bottom: 18px;
+    }
+
+    .filter-buttons {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .filter-btn {
+        display: inline-block;
+        padding: 12px 22px;
+        background: #ffffff;
+        color: var(--brand-dark);
+        border: 1px solid #ddd;
+        text-decoration: none;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+        background: var(--brand-slate);
+        border-color: var(--brand-slate);
+        color: #ffffff;
+    }
+
+    .filter-btn.active {
+        background: var(--brand-dark);
+        border-color: var(--brand-dark);
+        color: #ffffff;
+    }
     /* Hero Section matching the image colors */
     .hero-section {
-        background-color: whitesmoke; /* Light sky blue from image */
+        background-color: whitesmoke;
         padding: 60px 0;
         margin-bottom: 80px;
         position: relative;
@@ -32,7 +127,7 @@
         text-transform: uppercase;
     }
 
-    /* Square Shop Buttons like the "Shop Collection" box */
+    /* Square Shop Buttons */
     .btn-shop {
         display: inline-block;
         padding: 18px 50px;
@@ -47,13 +142,13 @@
     }
 
     .btn-bawal {
-        background: #ffffff; /* White like the "Shop Collection" button */
+        background: #ffffff; 
         color: var(--brand-dark) !important;
         border: none;
     }
 
     .btn-shawl {
-        background: #ffffff;
+        background: #ffffff; 
         color: var(--brand-dark) !important;
         border: none;
     }
@@ -84,7 +179,6 @@
         margin: 15px auto;
     }
 
-    /* Product Cards */
     .product-wrapper {
         background: transparent;
         padding: 0;
@@ -142,7 +236,8 @@
         color: var(--brand-dark);
         text-decoration: none;
         text-transform: uppercase;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
+        display: block;
     }
 
     .price-tag {
@@ -153,24 +248,75 @@
         margin-bottom: 4px;
     }
 
-    /* CR-004: Rating badge styles */
-    .rating-container {
-        font-size: 0.78rem;
+    /* Product Card Rating Styling */
+    .product-rating-badge {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 3px;
+        font-size: 0.85rem;
         margin-top: 2px;
     }
-
-    .stars-gold {
-        color: #f59e0b;
-        letter-spacing: 1px;
+    .star-gold {
+        color: #f5a623;
     }
-
-    .rating-meta {
-        color: #6b7280;
+    .star-grey {
+        color: #ddd;
+    }
+    .rating-score {
+        font-weight: 700;
+        color: #333;
+        font-size: 0.8rem;
+        margin-left: 3px;
+    }
+    .review-num {
+        color: #888;
         font-size: 0.75rem;
     }
+
+    /* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 100px;
+    height: 100px;
+    border: none;
+    background: var(--brand-dark);
+    color: #ffffff;
+    font-size: 3rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background: var(--brand-slate);
+}
+
+@media (max-width: 576px) {
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+.product-sold {
+    color: #888;
+    font-size: 0.7rem;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+}
 </style>
 
 <section class="hero-section">
@@ -185,109 +331,102 @@
 </section>
 
 <div class="container mb-5">
-    
-    <!-- Bawal Series -->
-    <div id="bawal">
-        <h2 class="section-label">Bawal Series</h2>
-        <div class="row g-4">
-            {% for product in bawal %}
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="product-wrapper">
-                    <div class="img-box">
-                        <a href="{% url 'product_detail' product.slug %}">
-                            <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
-                        </a>
-                        {% if product.stock == 0 %}
-                        <a class="bag-btn" style="text-decoration: none;">
-                            Out of stock!
-                        </a>
-                        {% else %}
-                        <a href="{% url 'add_to_cart' product.id %}" 
-                            class="bag-btn ajax-add-to-cart" 
-                            data-product-id="{{ product.id }}" 
-                            style="text-decoration: none;">
-                            Add to Cart +
-                        </a>
-                        {% endif %}
-                    </div>
 
-                    <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
-                    <p class="price-tag">RM {{ product.price|floatformat:2 }}</p>
+    <!-- Sort Dropdown -->
+    <div class="product-sort">
+        <label for="sortProducts">
+            Sort By
+        </label>
 
-                    <!-- CR-004: Star Rating and Review Count -->
-                    <div class="rating-container">
-                        {% if product.review_count and product.review_count > 0 %}
-                            <span class="stars-gold">
-                                {% for i in "12345" %}
-                                    {% if forloop.counter <= product.avg_rating %}★{% else %}☆{% endif %}
-                                {% endfor %}
-                            </span>
-                            <span class="rating-meta">({{ product.avg_rating|floatformat:1 }}) • {{ product.review_count }}</span>
-                        {% else %}
-                            <span class="rating-meta">No reviews yet</span>
-                        {% endif %}
-                    </div>
-
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <select id="sortProducts">
+            <option value="default">All Products</option>
+            <option value="best_seller">Best Seller</option>
+            <option value="top_rating">Top Rating</option>
+            <option value="price_low">Price: Low to High</option>
+            <option value="price_high">Price: High to Low</option>
+        </select>
     </div>
 
-    <div style="height: 60px;"></div>
-
-    <!-- Shawl Series -->
-    <div id="shawl">
-        <h2 class="section-label">Shawl Series</h2>
-        <div class="row g-4">
-            {% for product in shawl %}
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="product-wrapper">
-                    <div class="img-box">
-                        <a href="{% url 'product_detail' product.slug %}">
-                            <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
-                        </a>
-                        
-                        {% if product.stock == 0 %}
-                        <a class="bag-btn" style="text-decoration: none;">
-                            Out of stock!
-                        </a>
-                        {% else %}
-                        <a href="{% url 'add_to_cart' product.id %}" 
-                            class="bag-btn ajax-add-to-cart" 
-                            data-product-id="{{ product.id }}" 
-                            style="text-decoration: none;">
-                            Add to Cart +
-                        </a>
-                        {% endif %}
-                    </div>
-
-                    <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
-                    <p class="price-tag">RM {{ product.price|floatformat:2 }}</p>
-
-                    <!-- CR-004: Star Rating and Review Count -->
-                    <div class="d-flex align-items-center gap-1 mt-1" style="font-size: 0.85rem;">
-                        {% if product.review_count and product.review_count > 0 %}
-                            <span style="color: #f59e0b; font-size: 0.95rem; line-height: 1;">
-                                {% if product.avg_rating >= 1 %}★{% else %}☆{% endif %}
-                                {% if product.avg_rating >= 2 %}★{% else %}☆{% endif %}
-                                {% if product.avg_rating >= 3 %}★{% else %}☆{% endif %}
-                                {% if product.avg_rating >= 4 %}★{% else %}☆{% endif %}
-                                {% if product.avg_rating >= 5 %}★{% else %}☆{% endif %}
-                            </span>
-                            <span style="color: #6b7280; font-size: 0.75rem;">
-                                {{ product.avg_rating|floatformat:1 }} ({{ product.review_count }})
-                            </span>
-                        {% else %}
-                            <span style="color: #9ca3af; font-size: 0.75rem;">No reviews yet</span>
-                        {% endif %}
-                    </div>
-
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+    <!-- Products -->
+    <div id="productContainer">
+        {% include 'product_grid.html' %}
     </div>
 
 </div>
+
+<!-- Back to Top Button -->
+<button id="backToTop" class="back-to-top" title="Back to top">
+    ↑
+</button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sortSelect = document.getElementById('sortProducts');
+    const productContainer = document.getElementById('productContainer');
+    const backToTop = document.getElementById('backToTop');
+
+    if (!sortSelect || !productContainer) {
+        return;
+    }
+
+    /* Product Sorting */
+    sortSelect.addEventListener('change', function () {
+
+        const sortValue = this.value;
+        const scrollPosition = window.scrollY;
+
+        productContainer.style.opacity = '0.5';
+        productContainer.style.pointerEvents = 'none';
+
+        fetch(`{% url 'filter_products' %}?sort=${sortValue}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to filter products');
+                }
+
+                return response.text();
+            })
+            .then(html => {
+
+                productContainer.innerHTML = html;
+
+                productContainer.style.opacity = '1';
+                productContainer.style.pointerEvents = 'auto';
+
+                // Keep user's current scroll position
+                window.scrollTo(0, scrollPosition);
+            })
+            .catch(error => {
+
+                console.error('Error:', error);
+
+                productContainer.style.opacity = '1';
+                productContainer.style.pointerEvents = 'auto';
+            });
+    });
+
+    /* Back to Top */
+    window.addEventListener('scroll', function () {
+
+        if (window.scrollY > 400) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+
+    });
+
+    backToTop.addEventListener('click', function () {
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+    });
+
+});
+</script>
+
 {% endblock %}
