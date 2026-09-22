@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Container styling to match boutique aesthetic */
+    .login-container {
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+
+    .login-card {
+        border: 1px solid #f1f1f1 !important;
+        border-radius: 0 !important; /* Square edges */
+    }
+
+    .login-title {
+        font-family: 'Bodoni Moda', serif;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--brand-dark);
+    }
+
+    /* Target Form Labels */
+    .login-form label {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: var(--brand-dark);
+    }
+
+    /* Target Input Fields */
+    .login-form .form-control {
+        border-radius: 0 !important;
+        border: 1px solid #e2e8f0;
+        padding: 12px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .login-form .form-control:focus {
+        border-color: var(--brand-slate);
+        box-shadow: none;
+        outline: none;
+    }
+
+    /* Target the Login Button */
+    .btn-login {
+        font-family: 'Montserrat', sans-serif;
+        background-color: var(--brand-dark) !important;
+        color: white !important;
+        border: none;
+        border-radius: 0 !important;
+        padding: 14px;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        font-weight: 600;
+        text-transform: uppercase;
+        transition: 0.3s;
+    }
+
+    .btn-login:hover {
+        background-color: var(--brand-slate) !important;
+        transform: translateY(-2px);
+    }
+
+    .register-link {
+        color: var(--brand-slate);
+        text-decoration: underline;
+        font-weight: 500;
+    }
+</style>
+
+<div class="login-container">
+    <div class="container d-flex justify-content-center align-items-center">
+        <div class="card login-card p-4 p-lg-5 shadow-sm border-0" style="width: 100%; max-width: 450px;">
+            
+            <div class="text-center mb-5">
+                <h2 class="login-title">
+                    {% if user_type == 'Admin' %} Admin Portal {% else %} Welcome Back {% endif %}
+                </h2>
+                <p class="text-muted small">
+                    {% if user_type == 'Admin' %} Authorized access only {% else %} Log in to continue shopping! {% endif %}
+                </p>
+            </div>
+
+            <form method="post" class="login-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger border-0 small mb-4 py-2" style="background-color: #fef2f2; color: #991b1b; border-radius: 0;">
+                    <ul class="mb-0 list-unstyled">
+                        {% for error in form.non_field_errors %}
+                            <li><i class="bi bi-exclamation-circle me-2"></i>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="mb-4">
+                    <label for="id_username">Username</label>
+                    <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_password">Password</label>
+                    <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="btn btn-login w-100 mt-2">
+                    LOGIN
+                </button>
+            </form>
+
+            {% if user_type == 'Customer' %}
+            <div class="mt-4 text-center">
+                <p class="small text-muted mb-0">
+                    New to Hajaz Hijab? 
+                    <a href="{% url 'register' %}" class="register-link">Register here</a>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

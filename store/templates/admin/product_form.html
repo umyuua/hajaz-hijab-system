@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-wrapper" style="background: #fcfcfc; padding: 50px 0;">
+    <div class="container" style="max-width: 800px;">
+        <div class="mb-4">
+            <a href="{% url 'inventory_list' %}" class="btn-back" style="letter-spacing: 1px;">
+                <i class="bi bi-arrow-left me-1"></i> Back to Inventory
+            </a>
+            <h2 class="mt-3 fw-bold" style="font-family: 'Bodoni Moda', serif;">
+                {% if edit_mode %}Update Product{% else %}New Collection Item{% endif %}
+            </h2>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-0">
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Product Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Price (RM)</label>
+                            {{ form.price }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Initial Stock</label>
+                            {{ form.stock }}
+                        </div>
+                        <div class="col-12">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Description</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-12">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Product Image</label>
+                            <div class="border p-3 bg-light">
+                                {{ form.image }}
+                            </div>
+                        </div>
+                        <div class="col-12 pt-4">
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-dark w-100 py-3 rounded-0 fw-bold" style="letter-spacing: 2px;">
+                                    {% if edit_mode %}Save Changes{% else %}Publish Product{% endif %}
+                                </button>
+
+                                {% if edit_mode %}
+                                <button type="submit" name="delete_product" class="btn btn-danger w-100 py-3 rounded-0 fw-bold" 
+                                        style="letter-spacing: 2px; background-color: #dc3545; border: none;"
+                                        onclick="return confirm('Are you sure you want to permanently delete this product?')">
+                                    Delete Product
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .extra-small { font-size: 0.65rem; letter-spacing: 1.5px; }
+    input, textarea, select { 
+        border-color: #eee !important; 
+        font-size: 0.9rem !important;
+        padding: 12px !important;
+    }
+    input:focus, textarea:focus { 
+        border-color: var(--brand-slate) !important; 
+        box-shadow: none !important; 
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hajaz Hijab | Premium Modesty</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --soft-pink: #fce4ec;
+            --text-dark: #2d2d2d;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .bg-welcome {
+            /* Gradient darkens the right side slightly to make white text pop */
+            background:  
+                        url("/static/welcome.jpg");
+            height: 100vh;
+            background-position: center;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* Pushes content to the right */
+        }
+
+        .hero-card {
+            padding: 5rem;
+            color: white;
+            text-align: right; /* Aligns text inside the box to the right */
+            border-right: 5px solid var(--soft-pink); /* Accent line on the right */
+            margin-right: 8%; /* Spacing from the edge */
+            background: rgba(0, 0, 0, 0.1); /* Subtle dark glass effect */
+            backdrop-filter: blur(4px);
+        }
+
+        .brand-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 10px;
+            color: var(--soft-pink);
+        }
+
+        h1 {
+            font-family: 'Bodoni Moda', serif;
+            font-size: clamp(3.5rem, 10vw, 6rem);
+            line-height: 1;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .cta-group {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-end; /* Aligns buttons and links to the right */
+        }
+
+        .btn-fashion {
+            background-color: white;
+            color: var(--text-dark);
+            padding: 16px 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            border-radius: 0;
+            transition: 0.4s ease;
+            border: 1px solid white;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-decoration: none;
+        }
+
+        .btn-fashion:hover {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            transform: scale(1.05); /* Modern slight zoom effect */
+        }
+
+        .admin-entry {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .admin-entry:hover {
+            color: var(--soft-pink);
+        }
+
+        /* Responsive UI for Mobile */
+        @media (max-width: 768px) {
+            .bg-welcome {
+                justify-content: center; /* Center on mobile for better fit */
+            }
+            .hero-card {
+                margin-right: 0;
+                padding: 2rem;
+                text-align: center;
+                border-right: none;
+                border-bottom: 5px solid var(--soft-pink);
+            }
+            .cta-group {
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-welcome">
+        <div class="hero-card">
+            <span class="brand-subtitle">The Art of Modesty</span>
+            <h1>HAJAZ<br>HIJAB</h1>
+            
+            <div class="cta-group">
+                <a href="{% url 'homepage' %}" class="btn-fashion">
+                    Shop Collection
+                </a>
+                
+                <a href="{% url 'admin_login' %}" class="admin-entry">
+                    Admin Portal Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

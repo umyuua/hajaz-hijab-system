@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-wrapper" style="background: #fcfcfc; padding: 50px 0; min-height: 100vh;">
+    <div class="container">
+        <div class="mb-4">
+            <a href="{% url 'admin_panel' %}" class="btn-back" style="letter-spacing: 1px;">
+                <i class="bi bi-arrow-left me-1"></i> Back To Dashboard
+            </a>
+            <h1 class="mt-3 fw-bold" style="font-family: 'Bodoni Moda', serif;">Order Management</h1>
+            <p class="text-muted small text-uppercase" style="letter-spacing: 2px;">Manage verified purchases by fulfillment stage</p>
+        </div>
+
+        <ul class="nav nav-tabs border-0 mb-4" id="orderTabs" role="tablist" style="gap: 30px;">
+            <li class="nav-item">
+                <button class="nav-link active boutique-tab" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    Pending <span class="tab-count">({{ pending_orders.count }})</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link boutique-tab" id="packed-tab" data-bs-toggle="tab" data-bs-target="#packed" type="button" role="tab">
+                    Packed <span class="tab-count">({{ packed_orders.count }})</span>
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link boutique-tab" id="shipped-tab" data-bs-toggle="tab" data-bs-target="#shipped" type="button" role="tab">
+                    Shipped <span class="tab-count">({{ shipped_orders.count }})</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="orderTabsContent">
+            
+            <div class="tab-pane fade show active" id="pending" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="extra-small text-uppercase fw-bold text-muted" style="letter-spacing: 1px;">
+                                    <th class="ps-4 py-3">Order ID</th>
+                                    <th class="ps-4 py-3">Customer</th>
+                                    <th class="ps-4 py-3">Products</th>
+                                    <th class="ps-4 py-3">Total</th>
+                                    <th class="ps-4 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in pending_orders %}
+                                <tr style="border-bottom: 1px solid #f1f1f1;">
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark">#{{ order.id }}</span>
+                                        <div class="text-muted extra-small">{{ order.created_at|date:"d M, H:i" }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark small">{{ order.customer.get_full_name|default:order.customer.username }}</div>
+                                        <div class="text-muted extra-small" style="max-width: 200px; line-height: 1.2;">
+                                            {{ order.customer.customer.address|default:"No address provided" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <ul class="list-unstyled m-0 extra-small">
+                                            {% for item in order.items.all %}
+                                            <li><span class="text-muted">{{ item.quantity }}x</span> {{ item.product.name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td><span class="fw-bold text-dark">RM {{ order.total_price }}</span></td>
+                                    <td>
+                                        <form method="POST" action="{% url 'update_order_status' order.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                 <label class="extra-small fw-bold text-danger">Edit Note Here</label>
+                                                <input type="text" name="admin_note" class="form-control form-control-sm rounded-0 extra-small" 
+                                                    placeholder="Add a note..." value="Your order is packed! Ready to be shipped..">
+                                            </div>
+                                            <button type="submit" name="new_status" value="PACKED" 
+                                                    class="btn btn-sm btn-dark rounded-0 px-3 extra-small fw-bold w-100" 
+                                                    onclick="return confirm('Confirm to mark as packed?')">
+                                                MARK AS PACKED
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="packed" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="extra-small text-uppercase fw-bold text-muted" style="letter-spacing: 1px;">
+                                    <th class="ps-4 py-3">Order ID</th>
+                                    <th class="ps-4 py-3">Customer</th>
+                                    <th class="ps-4 py-3">Products</th>
+                                    <th class="ps-4 py-3">Total</th>
+                                    <th class="ps-4 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in packed_orders %}
+                                <tr style="border-bottom: 1px solid #f1f1f1;">
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark">#{{ order.id }}</span>
+                                        <div class="text-muted extra-small">{{ order.created_at|date:"d M, H:i" }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark small">{{ order.customer.get_full_name|default:order.customer.username }}</div>
+                                        <div class="text-muted extra-small" style="max-width: 200px; line-height: 1.2;">
+                                            {{ order.customer.customer.address|default:"No address provided" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <ul class="list-unstyled m-0 extra-small">
+                                            {% for item in order.items.all %}
+                                            <li><span class="text-muted">{{ item.quantity }}x</span> {{ item.product.name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td><span class="fw-bold text-dark">RM {{ order.total_price }}</span></td>
+                                    <td>
+                                        <form method="POST" action="{% url 'update_order_status' order.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                 <label class="extra-small fw-bold text-danger">Put tracking number here</label>
+                                                <input type="text" name="admin_note" class="form-control form-control-sm rounded-0 extra-small" 
+                                                    placeholder="Add a note..." value="Shipped by J&T Courier : Your tracking number is..">
+                                            </div>
+                                            <button type="submit" name="new_status" value="SHIPPED" class="btn btn-sm btn-dark rounded-0 px-3 extra-small fw-bold w-100"
+                                            onclick="return confirm('Confirm to mark as shipped?')">
+                                            MARK AS SHIPPED
+                                        </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-5 text-muted small">No packed orders.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="shipped" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="extra-small text-uppercase fw-bold text-muted" style="letter-spacing: 1px;">
+                                    <th class="ps-4 py-3">Order ID</th>
+                                    <th class="ps-4 py-3">Customer</th>
+                                    <th class="ps-4 py-3">Status</th>
+                                    <th class="ps-4 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in shipped_orders %}
+                                <tr style="border-bottom: 1px solid #f1f1f1;">
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark">#{{ order.id }}</span>
+                                        <div class="text-muted extra-small">{{ order.created_at|date:"d M, H:i" }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark small">{{ order.customer.get_full_name|default:order.customer.username }}</div>
+                                        <div class="text-muted extra-small" style="max-width: 200px; line-height: 1.2;">
+                                            {{ order.customer.customer.address|default:"No address provided" }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <ul class="list-unstyled m-0 extra-small">
+                                            {% for item in order.items.all %}
+                                            <li><span class="text-muted">{{ item.quantity }}x</span> {{ item.product.name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{% url 'update_order_status' order.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-2">
+                                                 <label class="extra-small fw-bold text-danger">Edit note here</label>
+                                                <input type="text" name="admin_note" class="form-control form-control-sm rounded-0 extra-small" 
+                                                    placeholder="Add a note..." value="Your order is succesfully delivered! Check for your parcel">
+                                            </div>
+                                            <button type="submit" name="new_status" value="DELIVERED" 
+                                            onclick="return confirm('Confirm to mark as delivered?')" 
+                                            class="btn btn-sm btn-success rounded-0 px-3 extra-small fw-bold w-100"  >
+                                            MARK DELIVERED
+                                        </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center py-5 text-muted small">No orders currently in transit.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Boutique Tab Styling */
+    .boutique-tab {
+        border: none !important;
+        background: transparent !important;
+        color: #999 !important;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        padding: 10px 0 !important;
+        border-bottom: 2px solid transparent !important;
+        transition: all 0.3s ease;
+    }
+    .boutique-tab.active {
+        color: #000 !important;
+        border-bottom: 2px solid #000 !important;
+    }
+    .tab-count { font-weight: 400; opacity: 0.6; margin-left: 5px; }
+    .extra-small { font-size: 0.65rem; }
+</style>
+{% endblock %}

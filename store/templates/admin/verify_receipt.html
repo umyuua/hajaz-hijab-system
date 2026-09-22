@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-wrapper" style="background: #fcfcfc; min-height: 100vh; padding: 60px 0;">
+    <div class="container">
+        <div class="mb-5">
+            <a href="{% url 'pending_receipts_list' %}" class="btn-back" style="letter-spacing: 2px;">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <h1 class="mt-3 fw-bold" style="font-family: 'Bodoni Moda', serif;">Verify Payment</h1>
+            <p class="text-muted small text-uppercase">Order #{{ order.id }} &bull; Customer: {{ order.user.get_full_name }}</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-0 p-4">
+                    <h5 class="extra-small fw-bold text-uppercase mb-4" style="letter-spacing: 1px;">Order Summary</h5>
+                    
+                    <div class="product-list mb-4">
+                        {% for item in order.items.all %}
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div style="max-width: 70%;">
+                                <p class="mb-0 fw-bold small text-dark">{{ item.product.name }}</p>
+                                <small class="text-muted">{{ item.quantity }} x RM {{ item.price_at_purchase }}</small>
+                            </div>
+                            <span class="small fw-bold text-dark">RM {{ item.total_item_price }}</span> 
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Amount Due: (incl. shipping fee)</span>
+                        <span class="fw-bold text-dark" style="font-size: 1.1rem;">RM {{ order.total_price }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="text-muted small">Payment Status:</span>
+                        <span class="badge {% if order.payment_status == 'UNVERIFIED' %}bg-warning text-dark{% else %}bg-dark text-white{% endif %} rounded-0 extra-small">
+                            {{ order.payment_status }}
+                        </span>
+                    </div>
+
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Admin Note / Rejection Reason</label>
+                            <textarea name="admin_note" rows="3" class="form-control rounded-0 border-light bg-light small" 
+                                    placeholder="Enter reason for rejection or internal notes..." 
+                                    style="font-size: 0.8rem;">{{ order.admin_note }}</textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="approve" onclick="return confirm('Approve this payment?')" 
+                                    class="btn btn-dark rounded-0 py-3 text-uppercase fw-bold extra-small" style="letter-spacing: 1px;">
+                                Approve Payment
+                            </button>
+                            <button type="submit" name="action" value="reject" onclick="return confirm('Reject this receipt?')" 
+                                    class="btn btn-outline-danger rounded-0 py-3 text-uppercase fw-bold extra-small" style="letter-spacing: 1px;">
+                                Reject Receipt
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-0 p-2 bg-white">
+                    <div class="receipt-container" style="background: #f8f9fa; border: 1px solid #eee; overflow: hidden;">
+                        {% if order.receipt %}
+                            <img src="{{ order.receipt.url }}" class="img-fluid w-100" id="receiptImage" style="cursor: zoom-in;">
+                        {% else %}
+                            <div class="py-5 text-center">
+                                <i class="bi bi-file-earmark-x fs-1 text-muted"></i>
+                                <p class="text-muted mt-2">No receipt uploaded for this order.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-3 text-center">
+                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Click the image to view full size</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .extra-small { font-size: 0.7rem; }
+    #receiptImage { transition: transform 0.3s ease; }
+    #receiptImage:active { transform: scale(1.5); cursor: grabbing; }
+</style>
+
+<script>
+    // Simple toggle for full-screen view
+    document.getElementById('receiptImage').onclick = function() {
+        window.open(this.src, '_blank');
+    };
+</script>
+{% endblock %}

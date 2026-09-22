@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 900px;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'homepage' %}" class="btn-back">
+            <i class="bi bi-arrow-left me-2"></i> Back
+        </a>
+        
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-4">
+            <div class="mb-4 text-center text-lg-start">
+                <h2 class="fw-bold text-uppercase mb-3" style="letter-spacing: 3px; color: var(--brand-dark);">Profile</h2>
+                <p class="text-muted small">Manage your personal identity and primary shipping information for a seamless checkout experience.</p>
+                <div style="width: 50px; height: 3px; background-color: var(--brand-slate);" class="mx-auto mx-lg-0 mb-4"></div>
+            </div>
+            
+            <div class="p-4 bg-light text-center">
+                <div class="rounded-circle bg-white d-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style="width: 80px; height: 80px; border: 1px solid var(--brand-bg-cool);">
+                    <span class="h3 mb-0 fw-bold" style="color: var(--brand-slate);">{{ request.user.username|slice:":1"|upper }}</span>
+                </div>
+                <h6 class="fw-bold mb-1 text-uppercase small">{{ request.user.username }}</h6>
+                <p class="extra-small text-muted mb-0">{{ request.user.email }}</p>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-0">
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="row g-4">
+                            {% if form.non_field_errors %}
+                                <div class="col-12">
+                                    {% for error in form.non_field_errors %}
+                                        <div class="alert-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <div class="col-md-12">
+                                <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Full Name</label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}
+                                    {% for error in form.full_name.errors %}<div class="error-message">{{ error }}</div>{% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Email Address</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}<div class="error-message">{{ error }}</div>{% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Phone Number</label>
+                                {{ form.phone }}
+                                {% if form.phone.errors %}
+                                    {% for error in form.phone.errors %}<div class="error-message">{{ error }}</div>{% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12">
+                                <label class="extra-small text-uppercase fw-bold text-muted mb-2 d-block">Shipping Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    {% for error in form.address.errors %}<div class="error-message">{{ error }}</div>{% endfor %}
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12 pt-3">
+                                <button type="submit" class="btn-auth btn-signup w-100 py-3 shadow-sm">
+                                    Update My Account
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base Inputs */
+    input, textarea {
+        display: block;
+        width: 100%;
+        padding: 14px 18px;
+        font-size: 0.85rem;
+        border: 1px solid #edf2f7;
+        border-radius: 0px !important;
+        font-family: 'Montserrat', sans-serif;
+        background-color: #fcfcfc;
+        transition: all 0.2s ease;
+    }
+
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: var(--brand-slate);
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .extra-small {
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+    }
+
+    .bg-light {
+        background-color: #f8fafc !important;
+    }
+</style>
+{% endblock %}

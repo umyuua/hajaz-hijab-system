@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .detail-container { padding: 80px 0; }
+    .product-main-img { 
+        width: 100%; 
+        border-radius: 8px; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    }
+    .detail-category {
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: var(--brand-primary);
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    .detail-title {
+        font-family: 'Bodoni Moda', serif;
+        font-size: 3rem;
+        margin: 15px 0;
+        color: var(--brand-dark);
+    }
+    .detail-price {
+        font-size: 1.5rem;
+        color: var(--brand-dark);
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+    .detail-desc {
+        line-height: 1.8;
+        color: #666;
+        margin-bottom: 40px;
+    }
+    .stock-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        background: #f0f0f0;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+    }
+
+    /* Image Hover Effect */
+    .product-main-img { 
+        width: 100%; 
+        border-radius: 8px; 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.5s ease;
+        cursor: zoom-in;
+    }
+
+    .product-main-img:hover {
+        transform: scale(1.02);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+    }
+
+    /* Styled Add to Bag Button */
+    .btn-bag {
+        display: block;
+        background: var(--brand-dark);
+        color: white !important;
+        text-decoration: none;
+        padding: 20px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-align: center;
+        border: 1px solid var(--brand-dark);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-bag:hover {
+        background: transparent;
+        color: var(--brand-dark) !important;
+        border-color: var(--brand-dark);
+    }
+
+    /* Soldier Out Button State */
+    .disabled-bag {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        border-color: #e2e8f0 !important;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="container detail-container">
+    <div class="mb-4">
+        <a href="{% url 'homepage' %}" class="btn-back">
+            <i class="bi bi-arrow-left me-2"></i> Back to Collection
+        </a>
+    </div>
+    <div class="row g-5">
+        <div class="col-md-6">
+            <div style="overflow: hidden; border-radius: 8px;">
+                <img src="{{ product.image.url }}" class="product-main-img" alt="{{ product.name }}">
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb" style="--bs-breadcrumb-divider: '·';">
+                    <li class="breadcrumb-item"><a href="{% url 'homepage' %}" class="text-decoration-none text-muted">Home</a></li>
+                    <li class="breadcrumb-item active">{{ product.category }}</li>
+                </ol>
+            </nav>
+
+            <span class="detail-category">{{ product.category }}</span>
+            <h1 class="detail-title">{{ product.name }}</h1>
+            <p class="detail-price">RM {{ product.price|floatformat:2 }}</p>
+            
+            <div class="stock-badge">
+                {% if product.stock > 0 %}
+                    <span class="text-dark">{{ product.stock }} pcs left!</span>
+                {% else %}
+                    <span class="text-danger">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <div class="detail-desc">
+                {{ product.description|linebreaks }}
+            </div>
+            {% if product.stock > 0 %}
+                <a href="{% url 'add_to_cart' product.id %}" 
+                            class="btn-bag ajax-add-to-cart" 
+                            data-product-id="{{ product.id }}" class="btn-bag">
+                    Add to Cart
+                </a>
+            {% else %}
+                <a class="btn-bag disabled-bag">
+                    Sold Out
+                </a>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Hero Section matching the image colors */
+    .hero-section {
+        background-color: whitesmoke; /* Light sky blue from image */
+        padding: 60px 0;
+        margin-bottom: 80px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-subtitle {
+        color: var(--brand-dark);
+        font-weight: 400;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        display: block;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
+
+    .hero-title {
+        font-family: 'Bodoni Moda', serif;
+        font-size: clamp(3.5rem, 10vw, 6rem);
+        font-weight: 700;
+        color: var(--brand-dark);
+        line-height: 1.1;
+        margin-bottom: 40px;
+        text-transform: uppercase;
+    }
+
+    /* Square Shop Buttons like the "Shop Collection" box */
+    .btn-shop {
+        display: inline-block;
+        padding: 18px 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        transition: 0.4s;
+        border-radius: 0;
+        margin: 10px;
+        text-decoration: none;
+    }
+
+    .btn-bawal {
+        background: #ffffff; /* White like the "Shop Collection" button */
+        color: var(--brand-dark) !important;
+        border: none;
+    }
+
+    .btn-shawl {
+        background: #ffffff;
+        color: var(--brand-dark) !important;
+        border: none;
+    }
+
+    .btn-shop:hover {
+        background-color: var(--brand-slate);
+        border-color: var(--brand-slate);
+        color: white !important;
+        transform: scale(1.05);
+    }
+
+    /* Elegant Section Headers */
+    .section-label {
+        font-family: 'Bodoni Moda', serif;
+        font-size: 2.5rem;
+        font-weight: 400;
+        margin: 80px 0 50px;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
+    .section-label::after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 2px;
+        background: var(--brand-lavender);
+        margin: 15px auto;
+    }
+
+    /* Product Cards */
+    .product-wrapper {
+        background: transparent;
+        padding: 0;
+        border: none;
+        transition: 0.4s ease;
+    }
+
+    .img-box {
+        position: relative;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+    }
+
+    .product-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .product-wrapper:hover .product-img {
+        transform: scale(1.08);
+    }
+
+    /* Square Bag Button */
+    .bag-btn {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        text-align: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--brand-dark);
+        transform: translateY(100%);
+        transition: 0.4s ease;
+        border: none;
+    }
+
+    .product-wrapper:hover .bag-btn {
+        transform: translateY(0);
+    }
+
+    .product-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+        color: var(--brand-dark);
+        text-decoration: none;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .price-tag {
+        color: var(--brand-slate);
+        font-weight: 400;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+</style>
+
+<section class="hero-section">
+    <div class="container text-center">
+        <span class="hero-subtitle">New Arrival 2026</span>
+        <h1 class="hero-title">The Art of <br> <i>Modesty</i></h1>
+        <div class="mt-4">
+            <a href="#bawal" class="btn-shop btn-bawal">Shop Bawal</a>
+            <a href="#shawl" class="btn-shop btn-shawl">Shop Shawl</a>
+        </div>
+    </div>
+</section>
+
+<div class="container mb-5">
+    
+    <div id="bawal">
+        <h2 class="section-label">Bawal Series</h2>
+        <div class="row g-4">
+            {% for product in bawal %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-wrapper">
+                    <div class="img-box">
+                        <a href="{% url 'product_detail' product.slug %}">
+                            <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
+                        </a>
+                        {% if product.stock == 0 %}
+                        <a class="bag-btn" style="text-decoration: none;">
+                            Out of stock!
+                        </a>
+                        {% else %}
+                        <a href="{% url 'add_to_cart' product.id %}" 
+                            class="bag-btn ajax-add-to-cart" 
+                            data-product-id="{{ product.id }}"
+                            style="text-decoration: none;">
+                            Add to Cart +
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
+                    <p class="price-tag">RM {{ product.price|floatformat:2 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div style="height: 60px;"></div>
+
+    <div id="shawl">
+        <h2 class="section-label">Shawl Series</h2>
+        <div class="row g-4">
+            {% for product in shawl %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-wrapper">
+                    <div class="img-box">
+                        <a href="{% url 'product_detail' product.slug %}">
+                            <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
+                        </a>
+                        
+                        <a href="{% url 'add_to_cart' product.id %}" 
+                            class="bag-btn ajax-add-to-cart" 
+                            data-product-id="{{ product.id }}" style="text-decoration: none;">
+                            Add to Cart +
+                        </a>
+                    </div>
+
+                    <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
+                    <p class="price-tag">RM {{ product.price|floatformat:2 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 1000px;">
+    
+    <div class="mb-5">
+        <a href="{% url 'homepage' %}" class="btn-back">
+            <i class="bi bi-arrow-left me-2"></i> Back to Shop
+        </a>
+        <br><br>
+        <h2 class="fw-bold text-uppercase" style="letter-spacing: 3px; color: var(--brand-dark);">Order History</h2>
+        <div style="width: 50px; height: 3px; background-color: var(--brand-slate);"></div>
+    </div>
+
+    <div class="order-list">
+        {% for order in orders %}
+        <div class="card border-0 mb-4 shadow-sm rounded-0">
+            <div class="card-header bg-white py-3 border-bottom px-4 d-flex justify-content-between align-items-center">
+                <span class="small fw-bold text-uppercase text-muted" style="letter-spacing: 1px;">
+                    Date: {{ order.created_at|date:"d M Y" }}
+                </span>
+                <span class="status-badge status-{{ order.order_status|lower }}">
+                    {{ order.get_order_status_display }}
+                </span>
+            </div>
+
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-5">
+                        <label class="d-block extra-small text-uppercase text-muted fw-bold mb-1">Products</label>
+                        <p class="mb-0 fw-semibold">
+                            {{ order.items.first.product.name }}
+                            {% if order.items.count > 1 %}
+                            <span class="text-muted fw-normal">(+{{ order.items.count|add:"-1" }} more items)</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="col-md-3 text-md-center mt-3 mt-md-0">
+                        <label class="d-block extra-small text-uppercase text-muted fw-bold mb-1">Payment Status</label>
+                        {% if order.payment_status == 'VERIFIED' %}
+                            <span class="text-success small fw-bold">VERIFIED</span>
+                        {% elif order.payment_status == 'REJECTED' %}
+                            <span class="text-danger small fw-bold">REJECTED</span>
+                        {% else %}
+                            <span class="text-warning small fw-bold">PENDING VERIFICATION</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                        <label class="d-block extra-small text-uppercase text-muted fw-bold mb-1">Total</label>
+                        <h5 class="fw-bold mb-2">RM {{ order.total_price }}</h5>
+                        <button class="btn-auth btn-signup py-2 px-4 shadow-none" 
+                                type="button" data-bs-toggle="collapse" data-bs-target="#details-{{ order.id }}">
+                            View Detail
+                        </button>
+                    </div>
+                </div>
+
+                <div class="collapse" id="details-{{ order.id }}">
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <h6 class="small fw-bold text-uppercase mb-3" style="letter-spacing: 1px;">Order Summary</h6>
+                                {% for item in order.items.all %}
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="small text-muted">{{ item.quantity }}x {{ item.product.name }}</span>
+                                    <span class="small fw-bold">RM {{ item.price_at_purchase }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 bg-light p-3">
+                                <h6 class="small fw-bold text-uppercase mb-2" style="letter-spacing: 1px;">Status Update</h6>
+                                <p class="small mb-2"><strong>Order Status:</strong> {{ order.get_order_status_display }}</p>
+                                
+                                {% if order.admin_note %}
+                                    <div class="small p-2 bg-white border mb-3">
+                                        <span class="text-danger fw-bold">Note:</span> {{ order.admin_note }}
+                                    </div>
+                                {% endif %}
+
+                                {% if order.receipt %}
+                                    <a href="{{ order.receipt.url }}" target="_blank" class="small text-dark text-decoration-underline fw-bold">
+                                        View Uploaded Receipt <i class="bi bi-box-arrow-up-right ms-1"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-5 border">
+            <p class="text-muted mb-4">You have no order history yet.</p>
+            <a href="{% url 'homepage' %}" class="btn-auth btn-signup">Start Shopping</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* Status Badge Styling */
+    .status-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 6px 15px;
+        text-transform: uppercase;
+    }
+    
+    .status-pending { color: #856404; background-color: #fff3cd; }
+    .status-packed { color: #553c9a; background-color: #e9d8fd; }
+    .status-shipped { color: #004085; background-color: #cce5ff; }
+    .status-delivered { color: #155724; background-color: #d4edda; }
+
+    .extra-small {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+    }
+
+    /* Override any default card rounding to match brand square buttons */
+    .rounded-0 { border-radius: 0 !important; }
+</style>
+{% endblock %}

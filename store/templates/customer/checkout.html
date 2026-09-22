@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+    <form method="POST" action="{% url 'checkout' %}">
+    {% csrf_token %}
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <h5 class="mb-4 text-uppercase fw-bold" style="letter-spacing: 1px;">Shipping Address</h5>
+            
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Country/Region</label>
+                    <select class="form-select rounded-0 py-2 shadow-none border-secondary-subtle" required>
+                        <option value="Malaysia" selected>Malaysia</option>
+                    </select>
+                </div>
+                
+                <div class="col-12">
+                    <label for="id_full_name" class="form-label small fw-bold text-muted text-uppercase">Full Name</label>
+                    <input type="text" 
+                        name="full_name"  id="id_full_name" 
+                        class="form-control rounded-0 py-2 shadow-none" 
+                        placeholder="e.g. Sarah Rahman" 
+                        value="{{ form.full_name.value|default:request.user.get_full_name }}" 
+                        required>
+                </div>
+
+                <div class="col-12">
+                    <label for="id_apartment" class="form-label small fw-bold text-muted text-uppercase">Apartment / Suite</label>
+                    <input type="text" name="apartment" id="id_apartment" 
+                        class="form-control rounded-0 py-2 shadow-none" 
+                        placeholder="Apartment, suite, unit, building, floor, etc."
+                        value="{{ form.apartment.value|default:'' }}" required>
+                </div>
+
+
+                <div class="col-12">
+                    <label for="id_address" class="form-label small fw-bold text-muted text-uppercase">Address</label>
+                    <input type="text" name="address" id="id_address" 
+                           class="form-control rounded-0 py-2 shadow-none" 
+                           placeholder="Street address"
+                           value="{{ form.address.value|default:'' }}" required>
+                </div>
+
+                
+                <div class="col-md-4">
+                    <label for="id_postcode" class="form-label small fw-bold text-muted text-uppercase">Postcode</label>
+                    <input type="text" name="postcode" id="id_postcode" 
+                           class="form-control rounded-0 py-2 shadow-none" 
+                           placeholder="50000"
+                           value="{{ form.postcode.value|default:'' }}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="id_city" class="form-label small fw-bold text-muted text-uppercase">City</label>
+                    <input type="text" name="city" id="id_city" 
+                           class="form-control rounded-0 py-2 shadow-none" 
+                           placeholder="Kuala Lumpur"
+                           value="{{ form.city.value|default:'' }}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="id_state" class="form-label small fw-bold text-muted text-uppercase">State</label>
+                    <select name="state" id="id_state" class="form-select rounded-0 py-2 shadow-none border-secondary-subtle" required>
+                        <option value="" selected disabled>Choose State...</option>
+                        <option>Johor</option>
+                        <option>Kedah</option>
+                        <option>Kelantan</option>
+                        <option>Kuala Lumpur</option>
+                        <option>Labuan</option>
+                        <option>Melaka</option>
+                        <option>Negeri Sembilan</option>
+                        <option>Pahang</option>
+                        <option>Perak</option>
+                        <option>Perlis</option>
+                        <option>Pulau Pinang</option>
+                        <option>Putrajaya</option>
+                        <option>Sabah</option>
+                        <option>Sarawak</option>
+                        <option>Selangor</option>
+                        <option>Terengganu</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label for="id_phone" class="form-label small fw-bold text-muted text-uppercase">Phone Number</label>
+                    <input type="text" name="phone" id="id_phone" 
+                           class="form-control rounded-0 py-2 shadow-none" 
+                           placeholder="+60 12-345 6789"
+                           value="{{ form.phone.value|default:'' }}" required>
+                </div>
+                
+                <div class="col-12 mt-4">
+                    <div class="form-check">
+                        <input type="checkbox" name="save_info" id="save_info" class="form-check-input border-secondary shadow-none">
+                        <label class="form-check-label small" for="save_info">
+                             Save this information for next time
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <div class="col-lg-5 bg-light p-4 border-start">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="text-uppercase fw-bold mb-0" style="letter-spacing: 1px;">Order Summary</h5>
+                </div>
+                
+                <div class="cart-items-preview mb-4">
+                    {% for item in cart_items %}
+                    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                        <div class="position-relative me-3">
+                            <img src="{{ item.product.image.url }}" style="width: 65px; height: 80px; object-fit: cover;" class="border rounded">
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-dark">
+                                {{ item.quantity }}
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <p class="mb-0 small fw-bold text-dark">{{ item.product.name }}</p>
+                                    <p class="mb-0 small text-muted">Quantity: {{ item.quantity }}</p>
+                                </div>
+                                <p class="mb-0 small fw-bold text-dark">RM {{ item.subtotal|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span>Subtotal</span>
+                    <span class="fw-bold">RM {{ total_price|floatformat:2 }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2 small">
+                    <span>Shipping</span>
+                    <span id="shipping-cost-display" class="fw-bold">RM 0.00</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="h6 fw-bold mb-0">Total</span>
+                    <div class="text-end">
+                        <small class="text-muted">MYR</small>
+                        <span id="total-cost-display" class="h4 fw-bold mb-0 ms-2">RM {{ total_price|floatformat:2 }}</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-dark w-100 rounded-0 py-3 fw-bold shadow-sm" style="letter-spacing: 2px;">
+                    COMPLETE ORDER
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Styling for a cleaner look */
+    .form-control::placeholder {
+        font-size: 0.85rem;
+        color: #adb5bd;
+    }
+    .form-label {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #000;
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('id_state'); // This is a <select> now
+    const shippingDisplay = document.getElementById('shipping-cost-display');
+    const totalDisplay = document.getElementById('total-cost-display');
+    
+    // We use |safe and |default:0 to ensure Django outputs a valid JS number
+    const subtotal = parseFloat("{{ total_price|default:0 }}");
+
+    // Change event is better for <select> than input
+    stateSelect.addEventListener('change', function() {
+        const state = this.value; // No need for .trim() on <select>
+        let shippingFee = 0;
+
+        if (state === "") {
+            shippingFee = 0;
+        } else if (["Sabah", "Sarawak", "Labuan"].includes(state)) {
+            shippingFee = 15.00;
+        } else {
+            shippingFee = 5.00;
+        }
+
+        // Update UI
+        shippingDisplay.innerText = "RM " + shippingFee.toFixed(2);
+        const finalTotal = subtotal + shippingFee;
+        totalDisplay.innerText = "RM " + finalTotal.toFixed(2);
+    });
+});
+</script>
+{% endblock %}

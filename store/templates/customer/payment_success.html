@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+    <div class="card shadow-lg border-0 text-center p-5" style="max-width: 500px; border-radius: 20px;">
+        
+        <div class="mb-4">
+            <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center" 
+                 style="width: 100px; height: 100px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-check-lg text-success" viewBox="0 0 16 16">
+                  <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                </svg>
+            </div>
+        </div>
+
+        <h2 class="fw-bold mb-3">Order Received!</h2>
+        <p class="text-muted mb-4">
+            Thank you! Your receipt for <strong>Order #{{ order.id }}</strong> has been uploaded successfully. 
+            We are now verifying your payment.
+        </p>
+
+        <div class="bg-light p-3 rounded-3 mb-4 text-start">
+            <div class="d-flex justify-content-between mb-1">
+                <span class="small text-secondary">Total Paid:</span>
+                <span class="small fw-bold">RM{{ order.total_price }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span class="small text-secondary">Status:</span>
+                <span class="badge bg-warning text-dark">Processing</span>
+            </div>
+        </div>
+
+        <div class="d-grid gap-3">
+            <a href="{% url 'order_history' %}" class="btn btn-dark btn-lg py-3 fw-semibold">
+                View My Orders
+            </a>
+            <a href="{% url 'homepage' %}" class="btn btn-outline-secondary border-0">
+                Continue Shopping
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Subtle entrance animation */
+    .card {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

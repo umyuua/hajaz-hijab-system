@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <a href="{% url 'admin_panel' %}" class="btn-back" style="letter-spacing: 1px;">
+                <i class="bi bi-arrow-left me-1"></i> Back To Dashboard
+            </a>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-5 rounded-0 text-center">
+                <h2 class="fw-bold mb-4" style="font-family: 'Bodoni Moda', serif;">Sales Reports</h2>
+                <p class="text-muted small text-uppercase mb-5">Select report duration to generate PDF</p>
+
+                <form action="{% url 'generate_pdf_report' %}" method="GET">
+                    <div class="mb-4">
+                        <select name="report_type" class="form-select rounded-0 py-3 text-center fw-bold small">
+                            <option value="weekly">WEEKLY REPORT (Last 7 Days)</option>
+                            <option value="monthly">MONTHLY REPORT (Last 30 Days)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 rounded-0 py-3 text-uppercase fw-bold">
+                        <i class="bi bi-file-earmark-pdf me-2"></i> Generate & Download
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

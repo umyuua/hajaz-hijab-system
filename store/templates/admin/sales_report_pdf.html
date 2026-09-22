@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page { size: a4 portrait; margin: 1.5cm; }
+        
+        body { 
+            font-family: 'Helvetica', 'Arial', sans-serif; 
+            color: #2C2C2C; /* Dark Charcoal instead of Black */
+        }
+
+        /* HAJAZ Luxury Header */
+        .brand-logo {
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 10px;
+            font-size: 30pt;
+            color: #D4AF37; /* Gold/Brass Logo */
+            text-transform: uppercase;
+            margin-bottom: 0px;
+        }
+
+        .header-table {
+            width: 100%;
+            border-bottom: 3px solid #D4AF37;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        .report-title { 
+            text-align: center;
+            font-size: 11pt; 
+            text-transform: uppercase; 
+            letter-spacing: 4px;
+            color: #888;
+        }
+
+        /* KPI Cards with Color */
+        .kpi-table {
+            width: 100%;
+            margin-bottom: 30px;
+            background-color: #F9F7F2; /* Light Sand Background */
+        }
+
+        .kpi-box {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .kpi-label { font-size: 8pt; color: #888; text-transform: uppercase; }
+        .kpi-value { font-size: 14pt; font-weight: bold; color: #2C2C2C; }
+
+        /* Colored Table Headers */
+        table { width: 100%; border-collapse: collapse; }
+        
+        th { 
+            background-color: #2C2C2C; /* Dark Header */
+            color: #FFFFFF; /* White Text */
+            padding: 12px; 
+            font-size: 9pt; 
+            text-transform: uppercase;
+            text-align: left; 
+        }
+
+        td { 
+            padding: 12px; 
+            border-bottom: 1px solid #EEEEEE; 
+            font-size: 10pt; 
+        }
+
+        /* Highlight Row for Top Sellers */
+        .insight-header {
+            background-color: #D4AF37;
+            color: white;
+            padding: 5px 10px;
+            font-size: 10pt;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+
+        /* Total Revenue Box */
+        .total-box { 
+            margin-top: 40px; 
+            text-align: right; 
+            padding: 20px;
+            background-color: #F9F7F2;
+            border-right: 5px solid #D4AF37;
+        }
+
+        .grand-total {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #D4AF37;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-table">
+        <div class="brand-logo">HAJAZ</div>
+        <div class="report-title">{{ title }}</div>
+    </div>
+
+    <table class="kpi-table">
+        <tr>
+            <td class="kpi-box" style="border-right: 1px solid #E0DED7;">
+                <div class="kpi-label">Avg. Order Value</div>
+                <div class="kpi-value">RM {{ avg_order_value }}</div>
+            </td>
+            <td class="kpi-box" style="border-right: 1px solid #E0DED7;">
+                <div class="kpi-label">Peak Sales Day</div>
+                <div class="kpi-value">{{ busiest_day }}</div>
+            </td>
+            <td class="kpi-box">
+                <div class="kpi-label">Total Volume</div>
+                <div class="kpi-value">{{ order_count }} Orders</div>
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th style="text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.created_at|date:"d/m/Y" }}</td>
+                <td style="font-weight: bold;">#{{ order.id }}</td>
+                <td>{{ order.customer.username }}</td>
+                <td style="text-align: right; color: #2E4D44; font-weight: bold;">RM {{ order.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="insight-header">TOP SELLING PRODUCTS</div>
+    <table style="width: 100%; border: 1px solid #F9F7F2;">
+        {% for item in top_products %}
+        <tr>
+            <td style="font-size: 9pt;">{{ item.product__name }}</td>
+            <td style="text-align: right; font-weight: bold;">{{ item.total_qty }} Sold</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="total-box">
+        <div style="font-size: 10pt; color: #888;">TOTAL VERIFIED REVENUE</div>
+        <div class="grand-total">RM {{ total_revenue }}</div>
+    </div>
+</body>
+</html>

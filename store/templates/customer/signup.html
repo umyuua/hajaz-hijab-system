@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .register-container { padding: 60px 0; }
+    
+    .register-card {
+        border: 1px solid #f1f1f1;
+        border-radius: 0;
+    }
+
+    /* Style for the labels */
+    .field-wrapper label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: var(--brand-dark);
+    }
+
+    /* Style for the input fields */
+    .field-wrapper input {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 0;
+        transition: all 0.3s ease;
+    }
+
+    .field-wrapper input:focus {
+        outline: none;
+        border-color: var(--brand-slate);
+    }
+
+    /* Error Message styling - Placed BELOW the input */
+    .error-text {
+        color: #be123c; /* Elegant deep red */
+        font-size: 0.75rem;
+        margin-top: 6px;
+        font-weight: 500;
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .btn-register {
+        background-color: var(--brand-dark);
+        color: white;
+        border: none;
+        border-radius: 0;
+        padding: 15px;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .help-text {
+        font-size: 0.65rem;
+        color: #94a3b8;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .register-header h2 {
+        font-family: 'Bodoni Moda', serif;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--brand-dark);
+    }
+</style>
+
+<div class="register-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card register-card shadow-sm p-4 p-lg-5">
+                    <div class="register-header text-center mb-5">
+                    <span class="brand-accent mb-2">Join the Community</span>
+                    <h2>Create Account</h2>
+                    <p class="sub-title" style="font-size: 0.9rem;">Experience premium modesty and exclusive collections.</p>
+                </div>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="registration-form">
+                            {% for field in form %}
+                                <div class="field-wrapper mb-4">
+                                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    
+                                    {{ field }}
+
+                                    {% if field.errors %}
+                                        <ul class="error-text">
+                                            {% for error in field.errors %}
+                                                <li><i class="bi bi-xclamation-circle me-1"></i> {{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+
+                                    {# 3. Render Help Text #}
+                                    {% if field.help_text %}
+                                        <span class="help-text">{{ field.help_text }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid mt-2">
+                            <button type="submit" class="btn btn-register">
+                                Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
