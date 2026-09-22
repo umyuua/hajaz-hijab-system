@@ -117,6 +117,12 @@
             </form>
 
             {% if user_type == 'Customer' %}
+            <form method="post" action="{% url 'resend_verification' %}" class="mt-4">
+                {% csrf_token %}
+                <label for="verification_email">Need a new verification email?</label>
+                <input type="email" name="email" id="verification_email" class="form-control" placeholder="Your registered email" required>
+                <button type="submit" class="btn btn-outline-secondary w-100 mt-2">Resend verification email</button>
+            </form>
             <div class="mt-4 text-center">
                 <p class="small text-muted mb-0">
                     New to Hajaz Hijab? 
