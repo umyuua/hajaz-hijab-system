@@ -1,6 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    /* Status Badge Styling */
+    .status-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        padding: 6px 15px;
+        text-transform: uppercase;
+    }
+    
+    .status-pending { color: #856404; background-color: #fff3cd; }
+    .status-packed { color: #553c9a; background-color: #e9d8fd; }
+    .status-shipped { color: #004085; background-color: #cce5ff; }
+    .status-delivered { color: #155724; background-color: #d4edda; }
+
+    .extra-small {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+    }
+
+    .rounded-0 { border-radius: 0 !important; }
+
+    /* Star Rating Display & Interactive Selectors */
+    .star-gold {
+        color: #f5a623;
+    }
+    .star-grey {
+        color: #ddd;
+    }
+    .star-rating-select {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        justify-content: flex-start;
+        gap: 3px;
+        margin-bottom: 6px;
+    }
+    .star-rating-select input {
+        display: none;
+    }
+    .star-rating-select label {
+        font-size: 1.35rem;
+        color: #dee2e6;
+        cursor: pointer;
+        transition: color 0.15s ease, transform 0.1s ease;
+        line-height: 1;
+        margin: 0;
+    }
+    .star-rating-select label:hover {
+        transform: scale(1.15);
+    }
+    .star-rating-select input:checked ~ label,
+    .star-rating-select label:hover,
+    .star-rating-select label:hover ~ label {
+        color: #f5a623;
+    }
+</style>
+
 <div class="container py-5" style="max-width: 1000px;">
     
     <div class="mb-5">
@@ -60,15 +117,90 @@
                 <div class="collapse" id="details-{{ order.id }}">
                     <div class="mt-4 pt-4 border-top">
                         <div class="row g-4">
+                            <!-- Left Column: Items and Review Forms -->
                             <div class="col-md-6">
-                                <h6 class="small fw-bold text-uppercase mb-3" style="letter-spacing: 1px;">Order Summary</h6>
+                                
+                                <!-- 1. Standalone Cards for Items with Completed Reviews -->
                                 {% for item in order.items.all %}
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="small text-muted">{{ item.quantity }}x {{ item.product.name }}</span>
-                                    <span class="small fw-bold">RM {{ item.price_at_purchase }}</span>
-                                </div>
+                                    {% with fb=item.feedback_set.first %}
+                                        {% if fb %}
+                                            <div class="border rounded p-3 bg-white mb-3 shadow-sm">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <span class="small fw-semibold text-dark">{{ item.quantity }}x {{ item.product.name }}</span>
+                                                    <span class="small fw-bold text-muted">RM {{ item.price_at_purchase }}</span>
+                                                </div>
+
+                                                <div class="border rounded p-2 bg-light">
+                                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                                        <div style="letter-spacing: 2px; font-size: 0.95rem;">
+                                                            <span class="{% if fb.rating >= 1 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                                            <span class="{% if fb.rating >= 2 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                                            <span class="{% if fb.rating >= 3 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                                            <span class="{% if fb.rating >= 4 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                                            <span class="{% if fb.rating >= 5 %}star-gold{% else %}star-grey{% endif %}">★</span>
+                                                        </div>
+                                                        <span class="extra-small text-muted">{{ fb.created_at|date:"d M Y" }}</span>
+                                                    </div>
+                                                    <p class="mb-2 small text-dark"><strong>Your Review:</strong> {{ fb.message }}</p>
+                                                    <div class="d-flex justify-content-end gap-2">
+                                                        <a href="{% url 'edit_user_feedback' fb.id %}" class="btn btn-sm btn-outline-dark py-0 px-2">Edit</a>
+                                                        <!-- Standalone Delete Form -->
+                                                        <form action="{% url 'delete_user_feedback' fb.id %}" method="POST" class="d-inline m-0">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="return confirm('Delete this feedback?');">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
                                 {% endfor %}
+
+                                <!-- 2. Batch Form for Unreviewed Items -->
+                                <form method="POST" action="{% url 'submit_all_feedback' order.id %}">
+                                    {% csrf_token %}
+                                    
+                                    {% for item in order.items.all %}
+                                        {% with fb=item.feedback_set.first %}
+                                            {% if not fb %}
+                                                <div class="border rounded p-3 bg-white mb-3 shadow-sm">
+                                                    <div class="d-flex justify-content-between mb-2">
+                                                        <span class="small fw-semibold text-dark">{{ item.quantity }}x {{ item.product.name }}</span>
+                                                        <span class="small fw-bold text-muted">RM {{ item.price_at_purchase }}</span>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                                        <span class="extra-small fw-bold text-uppercase text-muted">Rating:</span>
+                                                        <div class="star-rating-select">
+                                                            <input type="radio" id="star5_{{ item.id }}" name="rating_{{ item.id }}" value="5">
+                                                            <label for="star5_{{ item.id }}" title="5 stars">★</label>
+
+                                                            <input type="radio" id="star4_{{ item.id }}" name="rating_{{ item.id }}" value="4">
+                                                            <label for="star4_{{ item.id }}" title="4 stars">★</label>
+
+                                                            <input type="radio" id="star3_{{ item.id }}" name="rating_{{ item.id }}" value="3">
+                                                            <label for="star3_{{ item.id }}" title="3 stars">★</label>
+
+                                                            <input type="radio" id="star2_{{ item.id }}" name="rating_{{ item.id }}" value="2">
+                                                            <label for="star2_{{ item.id }}" title="2 stars">★</label>
+
+                                                            <input type="radio" id="star1_{{ item.id }}" name="rating_{{ item.id }}" value="1">
+                                                            <label for="star1_{{ item.id }}" title="1 star">★</label>
+                                                        </div>
+                                                    </div>
+                                                    <textarea name="message_{{ item.id }}" class="form-control form-control-sm" placeholder="Write your feedback..." rows="2"></textarea>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endfor %}
+
+                                    <button type="submit" class="btn btn-dark w-100 py-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.85rem;">
+                                        Submit All Reviews
+                                    </button>
+                                </form>
                             </div>
+                            
+                            <!-- Right Column: Status & Receipt -->
                             <div class="col-md-6 bg-light p-3">
                                 <h6 class="small fw-bold text-uppercase mb-2" style="letter-spacing: 1px;">Status Update</h6>
                                 <p class="small mb-2"><strong>Order Status:</strong> {{ order.get_order_status_display }}</p>
@@ -98,28 +230,4 @@
         {% endfor %}
     </div>
 </div>
-
-<style>
-    /* Status Badge Styling */
-    .status-badge {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        padding: 6px 15px;
-        text-transform: uppercase;
-    }
-    
-    .status-pending { color: #856404; background-color: #fff3cd; }
-    .status-packed { color: #553c9a; background-color: #e9d8fd; }
-    .status-shipped { color: #004085; background-color: #cce5ff; }
-    .status-delivered { color: #155724; background-color: #d4edda; }
-
-    .extra-small {
-        font-size: 0.65rem;
-        letter-spacing: 1px;
-    }
-
-    /* Override any default card rounding to match brand square buttons */
-    .rounded-0 { border-radius: 0 !important; }
-</style>
 {% endblock %}
