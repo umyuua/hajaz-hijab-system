@@ -33,8 +33,17 @@ def welcome(request):
     return render (request,"welcome.html")
 
 def homepage(request):
-    bawal_products = Product.objects.filter(category__iexact='bawal')
-    shawl_products = Product.objects.filter(category__iexact='shawl')
+    # Mengambil produk kategori bawal berserta purata rating
+    bawal_products = Product.objects.filter(category__iexact='bawal').annotate(
+        avg_rating=Avg('feedbacks__rating'),
+        review_count=Count('feedbacks')
+    )
+    
+    # Mengambil produk kategori shawl berserta purata rating
+    shawl_products = Product.objects.filter(category__iexact='shawl').annotate(
+        avg_rating=Avg('feedbacks__rating'),
+        review_count=Count('feedbacks')
+    )
     
     context = {
         'bawal': bawal_products,
@@ -47,8 +56,21 @@ def is_cust(user):
 
 @login_required
 def product_detail(request, slug):
-    product = get_object_or_404(Product, slug=slug)
-    return render(request, 'product_detail.html', {'product': product})
+    product = get_object_or_404(
+        Product.objects.annotate(
+            avg_rating=Avg('feedbacks__rating'),
+            review_count=Count('feedbacks')
+        ),
+        slug=slug
+    )
+
+    feedbacks = product.feedbacks.all().order_by('-created_at')
+    
+    context = {
+        'product': product,
+        'feedbacks': feedbacks,
+    }
+    return render(request, 'product_detail.html', context)
 
 def login_redirect(request):
     if request.user.groups.filter(name='Customer').exists():

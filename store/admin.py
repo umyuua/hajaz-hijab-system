@@ -12,3 +12,5 @@ from.models import Order
 admin.site.register(Order)
 from.models import OrderItem
 admin.site.register(OrderItem)
+from .models import Feedback
+admin.site.register(Feedback)

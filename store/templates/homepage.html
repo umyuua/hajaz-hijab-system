@@ -150,6 +150,26 @@
         font-weight: 400;
         font-size: 0.9rem;
         letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    /* CR-004: Rating badge styles */
+    .rating-container {
+        font-size: 0.78rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 2px;
+    }
+
+    .stars-gold {
+        color: #f59e0b;
+        letter-spacing: 1px;
+    }
+
+    .rating-meta {
+        color: #6b7280;
+        font-size: 0.75rem;
     }
 </style>
 
@@ -166,6 +186,7 @@
 
 <div class="container mb-5">
     
+    <!-- Bawal Series -->
     <div id="bawal">
         <h2 class="section-label">Bawal Series</h2>
         <div class="row g-4">
@@ -183,7 +204,7 @@
                         {% else %}
                         <a href="{% url 'add_to_cart' product.id %}" 
                             class="bag-btn ajax-add-to-cart" 
-                            data-product-id="{{ product.id }}"
+                            data-product-id="{{ product.id }}" 
                             style="text-decoration: none;">
                             Add to Cart +
                         </a>
@@ -192,6 +213,21 @@
 
                     <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
                     <p class="price-tag">RM {{ product.price|floatformat:2 }}</p>
+
+                    <!-- CR-004: Star Rating and Review Count -->
+                    <div class="rating-container">
+                        {% if product.review_count and product.review_count > 0 %}
+                            <span class="stars-gold">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.avg_rating %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="rating-meta">({{ product.avg_rating|floatformat:1 }}) • {{ product.review_count }}</span>
+                        {% else %}
+                            <span class="rating-meta">No reviews yet</span>
+                        {% endif %}
+                    </div>
+
                 </div>
             </div>
             {% endfor %}
@@ -200,6 +236,7 @@
 
     <div style="height: 60px;"></div>
 
+    <!-- Shawl Series -->
     <div id="shawl">
         <h2 class="section-label">Shawl Series</h2>
         <div class="row g-4">
@@ -211,15 +248,41 @@
                             <img src="{{ product.image.url }}" class="product-img" alt="{{ product.name }}">
                         </a>
                         
+                        {% if product.stock == 0 %}
+                        <a class="bag-btn" style="text-decoration: none;">
+                            Out of stock!
+                        </a>
+                        {% else %}
                         <a href="{% url 'add_to_cart' product.id %}" 
                             class="bag-btn ajax-add-to-cart" 
-                            data-product-id="{{ product.id }}" style="text-decoration: none;">
+                            data-product-id="{{ product.id }}" 
+                            style="text-decoration: none;">
                             Add to Cart +
                         </a>
+                        {% endif %}
                     </div>
 
                     <a href="{% url 'product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
                     <p class="price-tag">RM {{ product.price|floatformat:2 }}</p>
+
+                    <!-- CR-004: Star Rating and Review Count -->
+                    <div class="d-flex align-items-center gap-1 mt-1" style="font-size: 0.85rem;">
+                        {% if product.review_count and product.review_count > 0 %}
+                            <span style="color: #f59e0b; font-size: 0.95rem; line-height: 1;">
+                                {% if product.avg_rating >= 1 %}★{% else %}☆{% endif %}
+                                {% if product.avg_rating >= 2 %}★{% else %}☆{% endif %}
+                                {% if product.avg_rating >= 3 %}★{% else %}☆{% endif %}
+                                {% if product.avg_rating >= 4 %}★{% else %}☆{% endif %}
+                                {% if product.avg_rating >= 5 %}★{% else %}☆{% endif %}
+                            </span>
+                            <span style="color: #6b7280; font-size: 0.75rem;">
+                                {{ product.avg_rating|floatformat:1 }} ({{ product.review_count }})
+                            </span>
+                        {% else %}
+                            <span style="color: #9ca3af; font-size: 0.75rem;">No reviews yet</span>
+                        {% endif %}
+                    </div>
+
                 </div>
             </div>
             {% endfor %}
