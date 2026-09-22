@@ -8,7 +8,9 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html',extra_context={'user_type': 'Customer'}), name='login'),
     path('admin-login/', auth_views.LoginView.as_view(template_name='login.html',extra_context={'user_type': 'Admin'}), name='admin_login'),
     path('redirect/', views.login_redirect, name='login_redirect'),
-    path("register", views.signup, name='register'),
+    path("register/", views.signup, name='register'),
+    path("resend-verification/", views.resend_verification, name='resend_verification'),
+    path("verify-email/<uidb64>/<token>/", views.verify_email, name='verify_email'),
     path('logout/', views.logout_view, name='logout'),
 
     
