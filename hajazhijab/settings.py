@@ -12,6 +12,25 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import json
+
+_email_config_path = Path(__file__).resolve().parent.parent / 'email_config.local.json'
+_email_config = json.loads(_email_config_path.read_text(encoding='utf-8')) if _email_config_path.exists() else {}
+
+def email_setting(name, default=''):
+    return _email_config.get(name, os.environ.get(name, default))
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = email_setting("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(email_setting("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = str(email_setting("EMAIL_USE_TLS", "true")).lower() == "true"
+EMAIL_USE_SSL = str(email_setting("EMAIL_USE_SSL", "false")).lower() == "true"
+EMAIL_TIMEOUT = 15
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
+EMAIL_HOST_USER = email_setting("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = email_setting("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = email_setting("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+PUBLIC_BASE_URL = email_setting("PUBLIC_BASE_URL", "").rstrip("/")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

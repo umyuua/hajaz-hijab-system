@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 class CustomerSignupForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
     full_name = forms.CharField(max_length=100)
     phone = forms.CharField(max_length=20)
     password = forms.CharField(
@@ -35,7 +36,7 @@ class CustomerSignupForm(forms.ModelForm):
         phone = cleaned_data.get("phone")
 
         if email:
-            if User.objects.filter(email=email).exists():
+            if User.objects.filter(email__iexact=email).exists():
                 self.add_error('email', "This email address is already registered.")
 
         if password and confirm_password and password != confirm_password:

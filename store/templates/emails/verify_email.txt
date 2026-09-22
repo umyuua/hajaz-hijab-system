@@ -1,0 +1,10 @@
+Hello {{ user.first_name|default:user.username }},
+
+Thank you for registering with Hajaz Hijab.
+
+Verify your email address and activate your account using this link:
+{{ verification_url }}
+
+If you did not create this account, you can ignore this email.
+
+Hajaz Hijab Team

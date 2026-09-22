@@ -1,3 +1,12 @@
+import logging
+from django import forms
+from django.core.cache import cache
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from .email_verification import send_verification_email, email_delivery_error
+logger = logging.getLogger(__name__)
+
 
 from .models import *
 from .forms import *
@@ -59,23 +68,173 @@ def logout_view(request):
     return redirect(destination)
 
 def signup(request):
+
     if request.method == 'POST':
+
         form = CustomerSignupForm(request.POST)
+
         if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.first_name = form.cleaned_data['full_name']
-            user.save()
-            
-            Customer.objects.create(user=user, phone=form.cleaned_data['phone'])
-            group, _ = Group.objects.get_or_create(name='Customer')
-            user.groups.add(group)
-            
-            messages.success(request, "Registration successful! Please login.")
-            return redirect('login')
+
+            try:
+                with transaction.atomic():
+
+                    # Create User without immediately activating it.
+                    user = form.save(commit=False)
+
+                    user.set_password(
+                        form.cleaned_data['password']
+                    )
+
+                    user.first_name = form.cleaned_data['full_name']
+                    user.email = form.cleaned_data['email'].strip().lower()
+
+                    # IMPORTANT:
+                    # Customer cannot login until email is verified.
+                    user.is_active = False
+
+                    user.save()
+
+                    # Create Customer profile.
+                    Customer.objects.create(
+                        user=user,
+                        phone=form.cleaned_data['phone']
+                    )
+
+                    # Create/get Customer group.
+                    group, _ = Group.objects.get_or_create(
+                        name='Customer'
+                    )
+
+                    user.groups.add(group)
+
+                    # Send verification email.
+                    send_verification_email(
+                        request,
+                        user
+                    )
+
+                    messages.success(
+                        request,
+                        "Registration successful! "
+                        "A verification email has been sent to "
+                        f"{user.email}. Please check your inbox."
+                    )
+
+                    return redirect('login')
+
+            except Group.DoesNotExist:
+
+                messages.error(
+                    request,
+                    "User group configuration error. "
+                    "Please contact admin."
+                )
+
+            except DatabaseError:
+
+                messages.error(
+                    request,
+                    "A database error occurred. "
+                    "Please try again later."
+                )
+
+            except Exception as e:
+
+                logger.exception(
+                    "Customer signup verification email failed"
+                )
+
+                messages.error(
+                    request,
+                    email_delivery_error(e)
+                )
+
     else:
         form = CustomerSignupForm()
-    return render(request, 'customer/signup.html', {'form': form})
+
+    return render(
+        request,
+        'customer/signup.html',
+        {'form': form}
+    )
+
+
+def verify_email(request, uidb64, token):
+    """
+    Verify customer's email address.
+
+    If the token is valid, the user's is_active field is changed
+    from False to True.
+    """
+
+    try:
+        uid = force_str(
+            urlsafe_base64_decode(uidb64)
+        )
+
+        user = User.objects.get(pk=uid)
+
+    except (
+        TypeError,
+        ValueError,
+        OverflowError,
+        User.DoesNotExist
+    ):
+        user = None
+
+    if user is not None and default_token_generator.check_token(
+        user,
+        token
+    ):
+        if user.is_active:
+            messages.info(
+                request,
+                "Your email has already been verified. You can login."
+            )
+        else:
+            user.is_active = True
+            user.save(
+                update_fields=['is_active']
+            )
+
+            messages.success(
+                request,
+                "Your email has been verified successfully! "
+                "You can now login."
+            )
+
+        return redirect('login')
+
+    messages.error(
+        request,
+        "The verification link is invalid or has expired."
+    )
+
+    return redirect('login')
+
+
+def resend_verification(request):
+    if request.method == 'POST':
+        form = forms.Form(request.POST)
+        form.fields['email'] = forms.EmailField()
+        if form.is_valid():
+            user = User.objects.filter(
+                email__iexact=form.cleaned_data['email'], is_active=False,
+                customer__isnull=False,
+            ).first()
+            if user and cache.add(f'verification-resend-{user.pk}', True, 60):
+                try:
+                    send_verification_email(request, user)
+                except Exception:
+                    cache.delete(f'verification-resend-{user.pk}')
+                    logger.exception('Verification resend failed')
+                    messages.error(request, 'Email delivery is temporarily unavailable. Please try again later.')
+                    return redirect('login')
+            messages.info(request, 'If this email belongs to an unverified account, a verification link has been sent. Check your inbox and spam folder. Please wait a minute before requesting another link.')
+        else:
+            messages.error(request, 'Please enter a valid email address.')
+    return redirect('login')
+
 
 @login_required
 @user_passes_test(is_cust, login_url='login')
